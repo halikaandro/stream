@@ -15,6 +15,8 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.callbacks.base import BaseCallbackHandler
 from langchain_core.documents import Document
+from PIL import Image
+from RealESRGAN import RealESRGAN
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
@@ -116,6 +118,74 @@ def set_llm(selected_model: str, model_names: dict):
         # Display a more informative error message to the user
         st.error(f"Failed to change model! Error: {e}\n{selected_model}")
 
+# Define a dictionary for Real-ESRGAN's model weights
+upscale_model_weights = {
+    2: "weights/RealESRGAN_x2plus.pth",
+    4: "weights/RealESRGAN_x4plus.pth",
+    8: "weights/RealESRGAN_x8plus.pth"
+}
+
+# Define a function to upscale images using HuggingFace and Torch
+def image_upscaler(image: str, scale: int) -> Image:
+    """
+    Upscales the input image using the specified model and returns the upscaled image.
+
+    Parameters:
+    image (str): The file path of the input image.
+
+    Returns:
+    Image: The upscaled image.
+    """
+
+    # Assign the image to a variable
+    img = Image.open(image)
+
+    # Initialize the upscaler
+    upscaler = RealESRGAN(
+        device="cpu",
+        scale=scale
+    )
+
+    # Load the corresponding model weight
+    if scale in upscale_model_weights:
+        upscaler.load_weights(
+            upscale_model_weights[scale],
+            # Download the model weight if it doesn't exist
+            download=True,
+        )
+    else:
+        logger.error("Scale factor not in supported model weights.")
+    
+    try:
+        # Convert the opened image to RGB
+        img = img.convert("RGB")
+        logger.info("Image converted to RGB.")
+    except Exception as e:
+        logger.error(f"Failed to convert image to RGB. Error: {e}")
+
+    try:
+        # Capture start time
+        start_time = datetime.datetime.now()
+        
+        with st.spinner(
+            f"Began upscaling: {datetime.datetime.now().strftime('%H:%M:%S')}..."
+        ):
+            # Upscale the image
+            upscaled_img = upscaler.predict(img)
+            
+        # Capture end time
+        end_time = datetime.datetime.now()
+        
+        # Calculate the process duration
+        process_duration = end_time - start_time
+        
+        st.success(f"Success! Upscaling took {process_duration.total_seconds()} seconds.", icon="✅")
+    
+    except Exception as e:
+        logger.error(f"Failed to upscale image. Error: {e}")
+        st.error(f"Failed to upscale image! Please try again.")
+
+    return upscaled_img
 
 class StreamHandler(BaseCallbackHandler):
     """
