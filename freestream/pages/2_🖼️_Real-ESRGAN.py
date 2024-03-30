@@ -8,7 +8,7 @@ st.set_page_config(page_title="FreeStream: Image Upscaler", page_icon="🖼️")
 st.title("🖼️Real-ESRGAN")
 st.header(":green[_Upscale your images_]", divider="red")
 st.caption(
-    ":violet[_You won't be asked to sign up or pay, no matter how many times you use this service._]"
+    ":violet[_This image upscaler is free for life._]"
 )
 
 # Show footer
@@ -16,6 +16,14 @@ st.markdown(footer, unsafe_allow_html=True)
 
 # Create the sidebar
 st.sidebar.subheader("__User Panel__")
+st.sidebar.markdown(
+    """
+    Notice:
+    
+    Larger images will experience drastically longer processing times on higher upscaling factors, and may crash the application. For example, an image of 1301x851 with a 4x upscale factor took 507.988213 seconds.
+    """
+)
+st.sidebar.divider()
 # Add a file-upload button
 uploaded_files = st.sidebar.file_uploader(
     "Upload an image",
@@ -33,7 +41,7 @@ scale_radio = st.sidebar.radio(
     index=upscale_factors.index(2),  # Set the default index to 2
     key="upscale_factor",
     horizontal=True,  # Display the radio buttons horizontally
-    help="Choose your scale factor. If you change the value, and you've already uploaded an image, the image will be upscaled.",
+    help="Choose your scale factor. When changing the scale while there's an uploaded image, image upscaling will begin immediately.",
 )
 
 # Create two columns with a single row to organize the UI
