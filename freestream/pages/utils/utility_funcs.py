@@ -126,7 +126,7 @@ upscale_model_weights = {
 }
 
 
-# Define a function to upscale images using HuggingFace and Torch
+# Define a function to upscale images using Real-ESRGAN
 def image_upscaler(image: str, scale: int) -> Image:
     """
     Upscales the input image using the specified model and returns the upscaled image.
