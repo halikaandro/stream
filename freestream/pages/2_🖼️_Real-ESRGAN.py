@@ -4,7 +4,9 @@ import streamlit as st
 from pages import footer, image_upscaler, upscale_model_weights
 
 # Initialize page config
-st.set_page_config(page_title="FreeStream: Upscale Images with Real-ESRGAN", page_icon="🖼️")
+st.set_page_config(
+    page_title="FreeStream: Upscale Images with Real-ESRGAN", page_icon="🖼️"
+)
 st.title("🖼️Real-ESRGAN")
 st.header(":green[_Upscale your images_]", divider="red")
 st.caption(":violet[_This image upscaler is free for life._]")

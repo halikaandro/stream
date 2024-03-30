@@ -40,6 +40,7 @@ st.write(
     """
 )
 
+st.divider()
 
 st.markdown(
     """
