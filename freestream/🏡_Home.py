@@ -2,7 +2,9 @@ import streamlit as st
 
 from freestream import footer
 
-st.set_page_config(page_title="FreeStream: Unlimited Access to AI Tools", page_icon="🏡")
+st.set_page_config(
+    page_title="FreeStream: Unlimited Access to AI Tools", page_icon="🏡"
+)
 
 st.title("FreeStream")
 st.header(":green[_Unlimited Access to AI Tools_]", divider="red")

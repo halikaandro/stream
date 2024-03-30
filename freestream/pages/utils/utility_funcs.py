@@ -8,14 +8,13 @@ from typing import List
 import streamlit as st
 import torch
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.chat_message_histories import StreamlitChatMessageHistory
+from langchain_community.chat_message_histories import \
+    StreamlitChatMessageHistory
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.callbacks.base import BaseCallbackHandler
 from langchain_core.documents import Document
-from PIL import Image
-from transformers import pipeline
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
@@ -226,49 +225,3 @@ class PrintRetrievalHandler(BaseCallbackHandler):
             self.status.markdown(doc.page_content)
         self.status.update(state="complete")
 
-
-# Define a function to upscale images using HuggingFace and Torch
-def image_upscaler(image: str) -> Image:
-    """
-    Upscales the input image using the specified model and returns the upscaled image.
-
-    Parameters:
-    image (str): The file path of the input image.
-
-    Returns:
-    Image: The upscaled image.
-    """
-
-    # Assign the image to a variable
-    img = Image.open(image)
-
-    # Create the upscale pipeline
-    upscaler = pipeline(
-        "image-to-image",
-        model="caidas/swin2SR-classical-sr-x2-64",
-        framework="pt",
-        device="cuda" if torch.cuda.is_available() else "cpu",
-    )
-
-    # If the image is greater than 300 in either dimension, then
-    # stop the application
-    if img.width > 300 or img.height > 300:
-        st.warning(
-            "Image is too large. Please upload an image with a width and height less than 300."
-        )
-        st.stop()
-    else:
-        # Upscale the image
-        logger.info(
-            f"\nStarted upscaling {img} at {datetime.datetime.now().strftime('%H:%M:%S')}..."
-        )
-        with st.spinner(
-            f"Began upscaling: {datetime.datetime.now().strftime('%H:%M:%S')}..."
-        ):
-            upscaled_img = upscaler(img)
-            logger.info(
-                f"\nFinished upscaling {img} at {datetime.datetime.now().strftime('%H:%M:%S')}."
-            )
-            st.toast("Success!", icon="✅")
-
-    return upscaled_img

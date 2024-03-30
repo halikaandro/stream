@@ -1,17 +1,14 @@
 import os
 
 import streamlit as st
-from pages import image_upscaler, footer
-
-# Set expandable_segments
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+from pages import footer, image_upscaler, upscale_model_weights
 
 # Initialize page config
 st.set_page_config(page_title="FreeStream: Image Upscaler", page_icon="🖼️")
-st.title("🖼️Image Upscaler")
-# st.header(":green[_⚠️Under Construction⚠️_]", divider="red")
+st.title("🖼️Real-ESRGAN")
+st.header(":green[_Upscale your images_]", divider="red")
 st.caption(
-    ":violet[_This page is still under construction. Stability, processing speed and output quality will improve in time._]"
+    ":violet[_You won't be asked to sign up or pay, no matter how many times you use this service._]"
 )
 
 # Show footer
@@ -27,15 +24,21 @@ uploaded_files = st.sidebar.file_uploader(
     key="image_to_upscale",
 )
 
-st.divider()
+# Get the list of upscale factors from the dictionary
+upscale_factors = list(upscale_model_weights.keys())
+# Create a radio button widget with the list of upscale factors
+scale_radio = st.sidebar.radio(
+    label="Select an upscaling factor:",
+    options=upscale_factors,  # Use the list of upscale factors
+    index=upscale_factors.index(2),  # Set the default index to 2
+    key="upscale_factor",
+    horizontal=True,  # Display the radio buttons horizontally
+    help="Choose your scale factor. If you change the value, and you've already uploaded an image, the image will be upscaled.",
+)
+
 # Create a body paragraph
 st.markdown(
     """
-    **Limitations**:
-    
-    * Images with a width *or* height greater than 300 will not be upscaled due to resource limitations of this environment.
-    * The current upscaler, [Swin2SR](https://huggingface.co/caidas/swin2SR-classical-sr-x2-64), problematically generates new content around the edge of the image, especially on the right side.
-    
     """
 )
 
@@ -54,4 +57,4 @@ with image_showcase:  # add a try/except block
 
         # Upscale and show the upscaled image
         with right_image:
-            st.image(image_upscaler(uploaded_files))  # Latest uploaded image
+            st.image(image_upscaler(uploaded_files, scale_radio))  # Latest uploaded image
