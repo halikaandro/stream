@@ -15,7 +15,7 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.callbacks.base import BaseCallbackHandler
 from langchain_core.documents import Document
 from PIL import Image
-from transformers import pipeline
+from RealESRGAN import RealESRGAN
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
@@ -118,6 +118,76 @@ def set_llm(selected_model: str, model_names: dict):
         st.error(f"Failed to change model! Error: {e}\n{selected_model}")
 
 
+# Define a dictionary for Real-ESRGAN's model weights
+upscale_model_weights = {
+    2: "weights/RealESRGAN_x2plus.pth",
+    4: "weights/RealESRGAN_x4plus.pth",
+    8: "weights/RealESRGAN_x8plus.pth",
+}
+
+
+# Define a function to upscale images using Real-ESRGAN
+def image_upscaler(image: str, scale: int) -> Image:
+    """
+    Upscales the input image using the specified model and returns the upscaled image.
+
+    Parameters:
+    image (str): The file path of the input image.
+
+    Returns:
+    Image: The upscaled image.
+    """
+
+    # Assign the image to a variable
+    img = Image.open(image).convert("RGB")
+
+    # Initialize the upscaler
+    upscaler = RealESRGAN(
+        device="cuda" if torch.cuda.is_available() else "cpu", scale=scale
+    )
+
+    # Load the corresponding model weight
+    if scale in upscale_model_weights:
+        upscaler.load_weights(
+            upscale_model_weights[scale],
+            # Download the model weight if it doesn't exist
+            download=True,
+        )
+    else:
+        logger.error("Scale factor not in supported model weights.")
+
+    try:
+        # Capture start time
+        start_time = datetime.datetime.now()
+
+        with st.spinner(
+            f"Began upscaling: {datetime.datetime.now().strftime('%H:%M:%S')}..."
+        ):
+            # Upscale the image
+            upscaled_img = upscaler.predict(img)
+
+        # Capture end time
+        end_time = datetime.datetime.now()
+
+        # Calculate  and log the process duration
+        process_duration = end_time - start_time
+        logger.info(f"Upscale process took {process_duration.total_seconds()} seconds.")
+
+        # Notify the user
+        st.toast(
+            f"Success! Upscaling took {process_duration.total_seconds()} seconds.",
+            icon="😄",
+        )
+
+    except Exception as e:
+        logger.error(f"Failed to upscale image. Error: {e}")
+        st.error(f"Failed to upscale image! Please try again.")
+
+    return upscaled_img
+
+
+################################
+### CUSTOM CALLBACK HANDLERS ###
 class StreamHandler(BaseCallbackHandler):
     """
     A callback handler for streaming the model's output to the user interface.
@@ -225,50 +295,3 @@ class PrintRetrievalHandler(BaseCallbackHandler):
             self.status.write(f"**Document {idx} from {source}**")
             self.status.markdown(doc.page_content)
         self.status.update(state="complete")
-
-
-# Define a function to upscale images using HuggingFace and Torch
-def image_upscaler(image: str) -> Image:
-    """
-    Upscales the input image using the specified model and returns the upscaled image.
-
-    Parameters:
-    image (str): The file path of the input image.
-
-    Returns:
-    Image: The upscaled image.
-    """
-
-    # Assign the image to a variable
-    img = Image.open(image)
-
-    # Create the upscale pipeline
-    upscaler = pipeline(
-        "image-to-image",
-        model="caidas/swin2SR-classical-sr-x2-64",
-        framework="pt",
-        device="cuda" if torch.cuda.is_available() else "cpu",
-    )
-
-    # If the image is greater than 300 in either dimension, then
-    # stop the application
-    if img.width > 300 or img.height > 300:
-        st.warning(
-            "Image is too large. Please upload an image with a width and height less than 300."
-        )
-        st.stop()
-    else:
-        # Upscale the image
-        logger.info(
-            f"\nStarted upscaling {img} at {datetime.datetime.now().strftime('%H:%M:%S')}..."
-        )
-        with st.spinner(
-            f"Began upscaling: {datetime.datetime.now().strftime('%H:%M:%S')}..."
-        ):
-            upscaled_img = upscaler(img)
-            logger.info(
-                f"\nFinished upscaling {img} at {datetime.datetime.now().strftime('%H:%M:%S')}."
-            )
-            st.toast("Success!", icon="✅")
-
-    return upscaled_img

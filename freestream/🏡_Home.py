@@ -2,7 +2,9 @@ import streamlit as st
 
 from freestream import footer
 
-st.set_page_config(page_title="FreeStream: Unlimited Access to AI Tools", page_icon="🏡")
+st.set_page_config(
+    page_title="FreeStream: Unlimited Access to AI Tools", page_icon="🏡"
+)
 
 st.title("FreeStream")
 st.header(":green[_Unlimited Access to AI Tools_]", divider="red")
@@ -30,14 +32,15 @@ st.write(
 
     3) Context Relevance Validation:  To safeguard against errors, the system only generates a response if the retrieved context is sufficiently relevant to aide the AI's response.
     
-    ### :blue[Image Upscaler]:
+    ### :blue[Real-ESRGAN]:
     
-    :orange[A proof of concept page, the *Image Upscaler* upscales images by 2.0x.]
+    :orange[An image upscaler trained on "pure synthetic data." ]
     
-    While the plan to use [Real-ESRGAN](), is in progress, [Swin2SR](https://huggingface.co/caidas/swin2SR-classical-sr-x2-64) is used as a makeshift image upscaler. Due to the FreeStream's current environmental resource limitations, it cannot process images with a width or height greater than 300 pixels.
+    Real-ESRGAN usually powers image upscaling on those websites with free microservices that limit usage before asking for payment or sign up. We'll never do that here. Normally, Real-ESRGAN is capable of upscaling to arbitrary values, however due to the lack of GPU support on Streamlit Community Cloud, the application may crash if you try upscaling too large of an image or too large of a scale factor.
     """
 )
 
+st.divider()
 
 st.markdown(
     """
