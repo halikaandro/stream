@@ -21,6 +21,7 @@ setuptools = "^69.1.0"
 torch = { version = "^2.2.0", source = "torch" }
 opencv-python-headless = "^4.9.0.80"
 langchain-anthropic = "^0.1.4"
+realesrgan = {git = "https://github.com/sberbank-ai/Real-ESRGAN.git"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.3.0"
