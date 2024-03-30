@@ -20,7 +20,7 @@ st.sidebar.subheader("__User Panel__")
 uploaded_files = st.sidebar.file_uploader(
     "Upload an image",
     type=["png", "jpg", "jpeg"],
-    help="Click the button and upload a *single* image.",
+    help="Upload a *SINGLE* image. Uploading a new image will interrupt the upscaling process.",
     key="image_to_upscale",
 )
 
@@ -36,14 +36,6 @@ scale_radio = st.sidebar.radio(
     help="Choose your scale factor. If you change the value, and you've already uploaded an image, the image will be upscaled.",
 )
 
-# Create a body paragraph
-st.markdown(
-    """
-    """
-)
-
-st.divider()
-
 # Create two columns with a single row to organize the UI
 left_image, right_image = st.columns(2)
 # Define a container for image containers
@@ -57,4 +49,6 @@ with image_showcase:  # add a try/except block
 
         # Upscale and show the upscaled image
         with right_image:
-            st.image(image_upscaler(uploaded_files, scale_radio))  # Latest uploaded image
+            st.image(
+                image_upscaler(image=uploaded_files, scale=scale_radio)
+            )  # Latest uploaded image

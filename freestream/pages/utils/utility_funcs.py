@@ -8,8 +8,7 @@ from typing import List
 import streamlit as st
 import torch
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.chat_message_histories import \
-    StreamlitChatMessageHistory
+from langchain_community.chat_message_histories import StreamlitChatMessageHistory
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -118,12 +117,14 @@ def set_llm(selected_model: str, model_names: dict):
         # Display a more informative error message to the user
         st.error(f"Failed to change model! Error: {e}\n{selected_model}")
 
+
 # Define a dictionary for Real-ESRGAN's model weights
 upscale_model_weights = {
     2: "weights/RealESRGAN_x2plus.pth",
     4: "weights/RealESRGAN_x4plus.pth",
-    8: "weights/RealESRGAN_x8plus.pth"
+    8: "weights/RealESRGAN_x8plus.pth",
 }
+
 
 # Define a function to upscale images using HuggingFace and Torch
 def image_upscaler(image: str, scale: int) -> Image:
@@ -138,12 +139,11 @@ def image_upscaler(image: str, scale: int) -> Image:
     """
 
     # Assign the image to a variable
-    img = Image.open(image)
+    img = Image.open(image).convert("RGB")
 
     # Initialize the upscaler
     upscaler = RealESRGAN(
-        device="cpu",
-        scale=scale
+        device="cuda" if torch.cuda.is_available() else "cpu", scale=scale
     )
 
     # Load the corresponding model weight
@@ -155,38 +155,39 @@ def image_upscaler(image: str, scale: int) -> Image:
         )
     else:
         logger.error("Scale factor not in supported model weights.")
-    
-    try:
-        # Convert the opened image to RGB
-        img = img.convert("RGB")
-        logger.info("Image converted to RGB.")
-    except Exception as e:
-        logger.error(f"Failed to convert image to RGB. Error: {e}")
 
     try:
         # Capture start time
         start_time = datetime.datetime.now()
-        
+
         with st.spinner(
             f"Began upscaling: {datetime.datetime.now().strftime('%H:%M:%S')}..."
         ):
             # Upscale the image
             upscaled_img = upscaler.predict(img)
-            
+
         # Capture end time
         end_time = datetime.datetime.now()
-        
-        # Calculate the process duration
+
+        # Calculate  and log the process duration
         process_duration = end_time - start_time
-        
-        st.success(f"Success! Upscaling took {process_duration.total_seconds()} seconds.", icon="✅")
-    
+        logger.info(f"Upscale process took {process_duration.total_seconds()} seconds.")
+
+        # Notify the user
+        st.toast(
+            f"Success! Upscaling took {process_duration.total_seconds()} seconds.",
+            icon="😄",
+        )
+
     except Exception as e:
         logger.error(f"Failed to upscale image. Error: {e}")
         st.error(f"Failed to upscale image! Please try again.")
 
     return upscaled_img
 
+
+################################
+### CUSTOM CALLBACK HANDLERS ###
 class StreamHandler(BaseCallbackHandler):
     """
     A callback handler for streaming the model's output to the user interface.
@@ -294,4 +295,3 @@ class PrintRetrievalHandler(BaseCallbackHandler):
             self.status.write(f"**Document {idx} from {source}**")
             self.status.markdown(doc.page_content)
         self.status.update(state="complete")
-
