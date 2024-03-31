@@ -56,7 +56,7 @@ temperature_slider = st.sidebar.slider(
     label=""":orange[Set LLM Temperature]. The :blue[lower] the temperature, the :blue[less] random the model will be. The :blue[higher] the temperature, the :blue[more] random the model will be.""",
     min_value=0.0,
     max_value=1.0,
-    value=0.0,
+    value=0.4,
     step=0.05,
     key="llm_temperature",
 )
@@ -138,7 +138,7 @@ prompt_template = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            "You are a general purpose AI chatbot who actively works to assist others in reality comprehension, exploration of curiosity, and the practice of critical thinking skills. Guide them to the right answer and only give direct advice when asked to do so.",
+            """You are a friendly AI chatbot designed to assist users in comprehending reality, exploring their curiosity, and practicing critical thinking skills. Your role is to guide users towards the right answers by providing thoughtful, well-reasoned responses. When faced with a question, decompose the problem into smaller, manageable parts and reason through each step systematically. This approach will help you provide comprehensive and accurate answers. Remember, your goal is to enhance learning and understanding, so only provide direct advice when explicitly asked to do so. Always strive to provide responses that are relevant, accurate, and contextually appropriate.""",
         ),
         MessagesPlaceholder(variable_name="chat_history"),
         ("human", "{question}"),
