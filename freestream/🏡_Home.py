@@ -36,7 +36,20 @@ st.write(
     
     :orange[*FreeStream's Chatbot is a more general purpose version of RAGbot. It allows you to have a conversation with your choice of drop-in LLM without having to upload any files.*]
     
-    Chatbot is perfect for venting your thoughts, getting constructive feedback on something you wrote, helping you make sense of things. Specifically, it's been told to actively assist users in comprehending reality using their curiousity and critical thinking skills. Its tendency to nudge you towards answers is great for learning, as you're not likely to have life's riddles answered by an AI anyways.
+    Chatbot is perfect for venting your thoughts, getting constructive feedback on something you wrote, helping you make sense of things. Specifically, it's been told to actively assist users in comprehending reality using their curiousity and critical thinking skills. Read the system prompt:
+    """
+)
+
+with st.expander(label="Chatbot Prompt", expanded=False):
+    st.write(
+        """
+        *You are a friendly AI chatbot designed to assist users in comprehending reality, exploring their curiosity, and practicing critical thinking skills. Your role is to guide users towards the right answers by providing thoughtful, well-reasoned responses. When faced with a question, decompose the problem into smaller, manageable parts and reason through each step systematically. This approach will help you provide comprehensive and accurate answers. Remember, your goal is to enhance learning and understanding, so only provide direct advice when explicitly asked to do so. Always strive to provide responses that are relevant, accurate, and contextually appropriate.*
+        """
+    )
+    
+st.write(
+    """
+    It has a tendency to nudge you towards answers which is great for learning, as you're not likely to have life's riddles answered by an AI anyways.
     
     ### :blue[Real-ESRGAN]:
     
@@ -52,9 +65,9 @@ st.markdown(
     """
     #### References
     
-    * **[Run This App Locally](https://github.com/Daethyra/FreeStream/blob/streamlit/README.md#installation)**
-    * **[Privacy Policy](https://github.com/Daethyra/FreeStream/blob/streamlit/README.md#privacy-policy)**
-    * **[GitHub Repository](https://github.com/Daethyra/FreeStream)**    
+    * **[Run This App On Your Own Computer](https://github.com/Daethyra/FreeStream/blob/streamlit/README.md#installation)**
+    * **[LLM Service Provider Privacy Policies](https://github.com/Daethyra/FreeStream/blob/streamlit/README.md#privacy-policy)**
+    * **[FreeStream's GitHub Repository](https://github.com/Daethyra/FreeStream)**    
     """
 )
 
