@@ -1,5 +1,5 @@
 [logger]
-level = "info"
+level = "warning"
 # String format for logging messages. If logger.datetimeFormat is set,
 # logger messages will default to `%(asctime)s.%(msecs)03d %(message)s`. See
 # Python's documentation for available attributes:
