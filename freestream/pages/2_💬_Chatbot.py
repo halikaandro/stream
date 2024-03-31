@@ -3,16 +3,19 @@ import os
 import streamlit as st
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
-from langchain_community.chat_message_histories import StreamlitChatMessageHistory
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_anthropic import ChatAnthropic
+from langchain_community.chat_message_histories import StreamlitChatMessageHistory
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
 from pages import (
     PrintRetrievalHandler,
-    StreamHandler,
     RetrieveDocuments,
-    set_llm,
+    StreamHandler,
     footer,
+    set_bg_local,
+    set_llm,
 )
 
 # Initialize LangSmith tracing
@@ -22,27 +25,25 @@ os.environ["LANGCHAIN_ENDPOINT"] = st.secrets.LANGCHAIN.LANGCHAIN_ENDPOINT
 os.environ["LANGCHAIN_API_KEY"] = st.secrets.LANGCHAIN.LANGCHAIN_API_KEY
 
 # Set up page config
-st.set_page_config(page_title="FreeStream: RAGbot", page_icon="🤖")
-st.title("🤖RAGbot")
-st.header(":green[_Retrieval Augmented Generation Chatbot_]", divider="red")
-st.caption(":violet[_Ask Your Documents Questions_]")
+st.set_page_config(page_title="FreeStream: Chatbot", page_icon="💬")
+st.title("💬Chatbot")
+st.header(":green[_General Use Chatbot_]", divider="red")
+st.caption(":violet[_Ask Your Chatbot Questions_]")
 # Show footer
 st.markdown(footer, unsafe_allow_html=True)
 
 # Add sidebar
 st.sidebar.subheader("__User Panel__")
-# Add file-upload button
-uploaded_files = st.sidebar.file_uploader(
-    label="Upload a PDF or text file",
-    type=["pdf", "doc", "docx", "txt"],
-    help="Types supported: pdf, doc, docx, txt \n\nConsider the size of your files before you upload. Processing speed varies by server load.",
-    accept_multiple_files=True,
-)
-if not uploaded_files:
-    st.info("Please upload documents to continue.")
-    st.stop()
 
-retriever = RetrieveDocuments().configure_retriever(uploaded_files)
+# Create a on/off switch for the GIF background
+gif_bg = st.sidebar.toggle(
+    label="Rain Background",
+    value=False,
+    key="gif_background",
+    help="Turn on an experimental background.",
+)
+if gif_bg:
+    set_bg_local("assets/62.gif")
 
 # Add temperature header
 temperature_header = st.sidebar.markdown(
@@ -132,9 +133,25 @@ llm = model_names[
     selected_model
 ]  # Get the selected model from the `model_names` dictionary
 
+# Define the prompt template
+prompt_template = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "You are a general purpose AI chatbot who actively works to assist others in reality comprehension, exploration of curiosity, and the practice of critical thinking skills. Guide them to the right answer and only give direct advice when asked to do so.",
+        ),
+        MessagesPlaceholder(variable_name="chat_history"),
+        ("human", "{question}"),
+    ]
+)
+
 # Create a chain that ties everything together
-qa_chain = ConversationalRetrievalChain.from_llm(
-    llm, retriever=retriever, memory=memory, verbose=True
+chain = prompt_template | llm
+chain_with_history = RunnableWithMessageHistory(
+    runnable=chain,
+    get_session_history=lambda session_id: msgs,
+    input_messages_key="question",
+    history_messages_key="chat_history",
 )
 
 ### Chat History ###
@@ -154,12 +171,16 @@ if user_query := st.chat_input(placeholder="Ask me anything!"):
     st.chat_message("user").write(user_query)
 
     # Display assistant response
+    # Using a `with` block instantly displays the response without having to `st.write` it
     with st.chat_message("assistant"):
-        retrieval_handler = PrintRetrievalHandler(st.container())
         stream_handler = StreamHandler(st.empty())
-        response = qa_chain.run(
-            user_query, callbacks=[retrieval_handler, stream_handler]
+        response = chain_with_history.invoke(
+            {"question": user_query},
+            config={
+                "configurable": {"session_id": "any"},
+                "callbacks": [stream_handler],
+            },
         )
         # Force print Gemini's response
         if selected_model == "Gemini-Pro":
-            st.write(response)
+            st.write(response.content)

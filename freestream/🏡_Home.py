@@ -32,6 +32,12 @@ st.write(
 
     3) Context Relevance Validation:  To safeguard against errors, the system only generates a response if the retrieved context is sufficiently relevant to aide the AI's response.
     
+    ### :blue[Chatbot]:
+    
+    :orange[*FreeStream's Chatbot is a more general purpose version of RAGbot. It allows you to have a conversation with your choice of drop-in LLM without having to upload any files.*]
+    
+    Chatbot is perfect for venting your thoughts, getting constructive feedback on something you wrote, helping you make sense of things. Specifically, it's been told to actively assist users in comprehending reality using their curiousity and critical thinking skills. Its tendency to nudge you towards answers is great for learning, as you're not likely to have life's riddles answered by an AI anyways.
+    
     ### :blue[Real-ESRGAN]:
     
     :orange[An image upscaler trained on "pure synthetic data." ]

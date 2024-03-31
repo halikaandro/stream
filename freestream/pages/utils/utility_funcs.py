@@ -1,3 +1,4 @@
+import base64
 import datetime
 import logging
 import os
@@ -184,6 +185,55 @@ def image_upscaler(image: str, scale: int) -> Image:
         st.error(f"Failed to upscale image! Please try again.")
 
     return upscaled_img
+
+
+# Define a function to change the background to an image via URL
+# https://discuss.streamlit.io/t/how-do-i-use-a-background-image-on-streamlit/5067/19?u=daethyra
+def set_bg_url():
+    """
+    A function to unpack an image from url and set as bg.
+    Returns
+    -------
+    The background.
+    """
+
+    st.markdown(
+        f"""
+         <style>
+         .stApp {{
+             background: url("https://cdn.pixabay.com/photo/2020/06/19/22/33/wormhole-5319067_960_720.jpg");
+             background-size: cover
+         }}
+         </style>
+         """,
+        unsafe_allow_html=True,
+    )
+
+
+# Define a function to change the background to a local image
+# https://discuss.streamlit.io/t/how-do-i-use-a-background-image-on-streamlit/5067/16?u=daethyra
+def set_bg_local(main_bg):
+    """
+    A function to unpack an image from root folder and set as bg.
+
+    Returns
+    -------
+    The background.
+    """
+    # set bg name
+    main_bg_ext = "png"
+
+    st.markdown(
+        f"""
+         <style>
+         .stApp {{
+             background: url(data:image/{main_bg_ext};base64,{base64.b64encode(open(main_bg, "rb").read()).decode()});
+             background-size: cover
+         }}
+         </style>
+         """,
+        unsafe_allow_html=True,
+    )
 
 
 ################################
