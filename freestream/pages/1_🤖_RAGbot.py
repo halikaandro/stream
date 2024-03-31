@@ -143,8 +143,6 @@ qa_chain = ConversationalRetrievalChain.from_llm(
 # show a default message from the AI
 if len(msgs.messages) == 0 or st.sidebar.button("Clear message history"):
     msgs.clear()
-    # show a default message from the AI
-    msgs.add_ai_message("How can I help you?")
 
 # Display coversation history window
 avatars = {"human": "user", "ai": "assistant"}
