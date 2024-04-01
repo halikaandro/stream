@@ -123,7 +123,7 @@ def set_llm(selected_model: str, model_names: dict):
 upscale_model_weights = {
     2: "weights/RealESRGAN_x2plus.pth",
     4: "weights/RealESRGAN_x4plus.pth",
-    8: "weights/RealESRGAN_x8plus.pth",
+    # 8: "weights/RealESRGAN_x8plus.pth",
 }
 
 
