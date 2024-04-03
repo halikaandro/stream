@@ -5,24 +5,26 @@ from typing import Annotated, Sequence, TypedDict
 
 import streamlit as st
 from langchain import hub
+from langchain.agents import load_tools
 from langchain.tools.retriever import create_retriever_tool
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.messages import BaseMessage, FunctionMessage
 from langchain_core.utils.function_calling import convert_to_openai_function
 from langchain_openai import ChatOpenAI
+from langchain_openai import OpenAI
 from langgraph.graph import END, StateGraph
 from langgraph.prebuilt import ToolExecutor, ToolInvocation
 from pages import RetrieveDocuments
 
 # Set up page config
-st.set_page_config(page_title="FreeStream: Tool Executor", page_icon="🔧")
+st.set_page_config(page_title="FreeStream: Tool Executor", page_icon="🛠️")
 
-st.title(":tools: Tool Executor")
+st.title("🛠️ Tool Executor")
 
 os.environ["TAVILY_API_KEY"] = st.secrets.TAVILY.TAVILY_API_KEY
 
 # Add a file upload button
-uploaded_files = st.file_uploader(label="")
+uploaded_files = st.sidebar.file_uploader(label="Upload your documentation", type=["doc", "docx"])
 
 ############ question for next coding:
 # -- do i want to let them upload files, or does it make more sense to build a more niche bot? --
@@ -30,30 +32,58 @@ uploaded_files = st.file_uploader(label="")
 # does it make more sense to use another tool? perhaps leave retrieval to RAGbot
 #   - i could extend the search capabilities by adding wikipedia, ddg, etc. to the toolbox
 
-if not uploaded_files:
-    st.stop()
+# Add temperature header
+temperature_header = st.sidebar.markdown(
+    """
+    ## Temperature Slider
+    """
+)
+# Add the sidebar temperature slider
+temperature_slider = st.sidebar.slider(
+    label=""":orange[Set LLM Temperature]. The :blue[lower] the temperature, the :blue[less] random the model will be. The :blue[higher] the temperature, the :blue[more] random the model will be.""",
+    min_value=0.0,
+    max_value=1.0,
+    value=0.0,
+    step=0.05,
+    key="llm_temperature",
+)
 
-# Instantiate the retriever
-retriever = RetrieveDocuments().configure_retriever(uploaded_files)
+# Set our Agent's Chat Model
+model = ChatOpenAI(
+    model="gpt-3.5-turbo",
+    temperature=temperature_slider,
+    openai_api_key=st.secrets.OPENAI.openai_api_key,
+)
+
+# Set a model for tools
+# Requires an 'LLM' not 'Chat Model'
+toollm = OpenAI(
+    model="gpt-3.5-turbo",
+    temperature=temperature_slider,
+    openai_api_key=st.secrets.OPENAI.openai_api_key,
+)
 
 # Instantiate tools
 tavily_search = TavilySearchResults()
 
-retriever_tool = create_retriever_tool(
-    retriever,
-    "search_langchain_api_docs",
-    "Searches and returns Python API documentation.",
-)
+# Decide the contents of `toolbox` based on file upload
+if not uploaded_files:
+    toolbox = [tavily_search]
+else:
+    # Instantiate the retriever
+    retriever = RetrieveDocuments().configure_retriever(uploaded_files)
+    # Create a retrieval tool
+    retriever_tool = create_retriever_tool(
+        retriever,
+        "search_langchain_api_docs",
+        "Searches and returns Python API documentation.",
+    )
+    # Assort tools
+    toolbox = [tavily_search, retriever_tool]
 
-toolbox = [tavily_search, retriever_tool]
+toolbox = toolbox + load_tools(tool_names=["llm-math"], llm=toollm)
 
 prompt = hub.pull("daethyra/openai-tools-agent")
-
-model = ChatOpenAI(
-    model="gpt-3.5-turbo",
-    temperature=0,
-    openai_api_key=st.secrets.OPENAI.openai_api_key,
-)
 
 # Instantiate the tool executor
 tool_executor = ToolExecutor(toolbox)
@@ -203,3 +233,46 @@ workflow.add_edge("action", "agent")
 # This compiles it into a LangChain Runnable,
 # meaning you can use it as you would any other runnable
 app = workflow.compile()
+
+### Chat History ###
+# if the length of messages is 0, or when the user \
+# clicks the clear button,
+# show a default message from the AI
+if len(msgs.messages) == 0 or st.sidebar.button("Clear message history"):
+    msgs.clear()
+
+# Display coversation history window
+avatars = {"human": "user", "ai": "assistant"}
+for msg in msgs.messages:
+    st.chat_message(avatars[msg.type]).write(msg.content)
+
+# Display user input field and enter button
+if user_query := st.chat_input(placeholder="Ask me anything!"):
+    st.chat_message("user").write(user_query)
+
+    # Display assistant response
+    # Using a `with` block instantly displays the response without having to `st.write` it
+    with st.chat_message("assistant"):
+        stream_handler = StreamHandler(st.empty())
+        response = chain_with_history.invoke(
+            {"question": user_query},
+            config={
+                "configurable": {"session_id": "any"},
+                "callbacks": [stream_handler],
+            },
+        )
+        # Force print Gemini's response
+        if selected_model == "Gemini-Pro":
+            st.write(response.content)
+
+### STREAMING IDEA:
+"""from langchain_core.messages import HumanMessage
+
+inputs = {"messages": [HumanMessage(content="what *specifically* do I write in my .yml file to run black against my code upon a pull request? i want to make sure that black's formatting is automated in our CI/CD pipeline.")]}
+for output in app.stream(inputs):
+    # stream() yields dictionaries with output keyed by node name
+    for key, value in output.items():
+        print(f"Output from node '{key}':")
+        print("---")
+        print(value)
+    print("\n---\n")"""
