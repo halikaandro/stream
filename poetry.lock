@@ -1878,6 +1878,21 @@ langchain-core = ">=0.1.28,<0.2.0"
 extended-testing = ["lxml (>=5.1.0,<6.0.0)"]
 
 [[package]]
+name = "langchainhub"
+version = "0.1.15"
+description = "The LangChain Hub API client"
+optional = false
+python-versions = ">=3.8.1,<4.0"
+files = [
+    {file = "langchainhub-0.1.15-py3-none-any.whl", hash = "sha256:89a0951abd1db255e91c6d545d092a598fc255aa865d1ffc3ce8f93bbeae60e7"},
+    {file = "langchainhub-0.1.15.tar.gz", hash = "sha256:fa3ff81a31946860f84c119f1e2f6b7c7707e2bd7ed2394a7313b286d59f3bda"},
+]
+
+[package.dependencies]
+requests = ">=2,<3"
+types-requests = ">=2.31.0.2,<3.0.0.0"
+
+[[package]]
 name = "langdetect"
 version = "1.0.9"
 description = "Language detection library ported from Google's language-detection."
@@ -4791,6 +4806,21 @@ files = [
 widechars = ["wcwidth"]
 
 [[package]]
+name = "tavily-python"
+version = "0.3.3"
+description = "Python wrapper for the Tavily API"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "tavily-python-0.3.3.tar.gz", hash = "sha256:14ac3d0cb5d2ce05487e7e8020460cd7b88d83c9916f46e344bcf25577acd346"},
+    {file = "tavily_python-0.3.3-py3-none-any.whl", hash = "sha256:032d598fe855d77c61e75ddd1faafd3b2c3aff37e88f43431a728610e26dcc4d"},
+]
+
+[package.dependencies]
+requests = "*"
+tiktoken = ">=0.5.2,<1"
+
+[[package]]
 name = "tenacity"
 version = "8.2.3"
 description = "Retry code until it succeeds"
@@ -5265,6 +5295,20 @@ filelock = "*"
 build = ["cmake (>=3.20)", "lit"]
 tests = ["autopep8", "flake8", "isort", "numpy", "pytest", "scipy (>=1.7.1)", "torch"]
 tutorials = ["matplotlib", "pandas", "tabulate", "torch"]
+
+[[package]]
+name = "types-requests"
+version = "2.31.0.20240403"
+description = "Typing stubs for requests"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "types-requests-2.31.0.20240403.tar.gz", hash = "sha256:e1e0cd0b655334f39d9f872b68a1310f0e343647688bf2cee932ec4c2b04de59"},
+    {file = "types_requests-2.31.0.20240403-py3-none-any.whl", hash = "sha256:06abf6a68f5c4f2a62f6bb006672dfb26ed50ccbfddb281e1ee6f09a65707d5d"},
+]
+
+[package.dependencies]
+urllib3 = ">=2"
 
 [[package]]
 name = "typing-extensions"
@@ -5749,4 +5793,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "3e7b22f0bd71fea70a9efddba3b681d6a8b686b12151273d75af2ce46800cda8"
+content-hash = "498fa25a1cb09d560ad860cfd35de9d49627619581cefc84afe68dc5973d6d1d"
