@@ -1,0 +1,16 @@
+name: Format with Black
+
+on: 
+    pull_request:
+        branches:
+            - streamlit
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: psf/black@stable
+        with:
+          options: "--color"
+          src: "./freestream"
