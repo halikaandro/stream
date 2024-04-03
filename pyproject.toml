@@ -23,6 +23,7 @@ opencv-python-headless = "^4.9.0.80"
 langchain-anthropic = "^0.1.4"
 realesrgan = {git = "https://github.com/sberbank-ai/Real-ESRGAN.git"}
 langgraph = "^0.0.31"
+numexpr = "^2.10.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.3.0"
