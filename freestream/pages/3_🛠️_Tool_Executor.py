@@ -7,10 +7,12 @@ import streamlit as st
 from langchain import hub
 from langchain.agents import load_tools
 from langchain.tools.retriever import create_retriever_tool
+from langchain_community.callbacks import StreamlitCallbackHandler
 from langchain_community.chat_message_histories import \
     StreamlitChatMessageHistory
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.messages import BaseMessage, FunctionMessage, HumanMessage
+from langchain_core.runnables import RunnableConfig
 from langchain_core.utils.function_calling import convert_to_openai_function
 from langchain_openai import ChatOpenAI, OpenAI
 from langgraph.graph import END, StateGraph
@@ -28,12 +30,6 @@ os.environ["TAVILY_API_KEY"] = st.secrets.TAVILY.TAVILY_API_KEY
 
 # Add a file upload button
 uploaded_files = st.sidebar.file_uploader(label="Upload your documentation", type=["doc", "docx"])
-
-############ question for next coding:
-# -- do i want to let them upload files, or does it make more sense to build a more niche bot? --
-# the purpose of the page is to demonstrate cyclical workflows for LLMs, so what would do that best?
-# does it make more sense to use another tool? perhaps leave retrieval to RAGbot
-#   - i could extend the search capabilities by adding wikipedia, ddg, etc. to the toolbox
 
 # Add temperature header
 temperature_header = st.sidebar.markdown(
@@ -56,6 +52,7 @@ model = ChatOpenAI(
     model="gpt-3.5-turbo",
     temperature=temperature_slider,
     openai_api_key=st.secrets.OPENAI.openai_api_key,
+    streaming=True,
 )
 
 # Set a model for tools
@@ -64,6 +61,7 @@ toollm = OpenAI(
     model="gpt-3.5-turbo",
     temperature=temperature_slider,
     openai_api_key=st.secrets.OPENAI.openai_api_key,
+    streaming=True,
 )
 
 # Instantiate tools
@@ -243,7 +241,7 @@ msgs = StreamlitChatMessageHistory()
 # if the length of messages is 0, or when the user \
 # clicks the clear button,
 # show a default message from the AI
-if len(msgs.messages) == 0 or st.sidebar.button("Clear message history"):
+if st.sidebar.button("Clear message history"):
     msgs.clear()
 
 # Display coversation history window
@@ -251,17 +249,20 @@ avatars = {"human": "user", "ai": "assistant"}
 for msg in msgs.messages:
     st.chat_message(avatars[msg.type]).write(msg.content)
 
+output_container = st.empty()
+
 # Display user input field and enter button
-if user_query := st.chat_input(placeholder="Ask me anything!"):
-    st.chat_message("user").write(user_query)
+if user_query := st.chat_input(placeholder="What task may I achieve for you?"):
+    # Show user input
+    output_container = output_container.container()
+    output_container.chat_message("user").write(user_query)
     
     # Display assistant response
-    with st.chat_message("assistant"):
-        user_query = {"messages": [HumanMessage(content=user_query)]}
-        for output in app.stream(user_query):
-            # stream() yields dictionaries with output keyed by node name
-            for key, value in output.items():
-                st.write(f"Output from node '{key}':")
-                st.markdown("---")
-                st.write(value)
-            st.markdown("\n---\n")
+    answer_container = output_container.chat_message("assistant", avatar="🦜")
+    
+    st_callback = StreamlitCallbackHandler(answer_container)
+    cfg = RunnableConfig()
+    cfg["callbacks"] = [st_callback]
+
+    answer = app.invoke({"input": [HumanMessage(content=user_query)]}, cfg)
+    answer_container.write(answer["output"])
