@@ -238,6 +238,8 @@ workflow.add_edge("action", "agent")
 app = workflow.compile()
 
 ### Chat History ###
+# Setup memory for contextual conversation
+msgs = StreamlitChatMessageHistory()
 # if the length of messages is 0, or when the user \
 # clicks the clear button,
 # show a default message from the AI
@@ -252,30 +254,14 @@ for msg in msgs.messages:
 # Display user input field and enter button
 if user_query := st.chat_input(placeholder="Ask me anything!"):
     st.chat_message("user").write(user_query)
-
+    
     # Display assistant response
-    # Using a `with` block instantly displays the response without having to `st.write` it
     with st.chat_message("assistant"):
-        stream_handler = StreamHandler(st.empty())
-        response = chain_with_history.invoke(
-            {"question": user_query},
-            config={
-                "configurable": {"session_id": "any"},
-                "callbacks": [stream_handler],
-            },
-        )
-        # Force print Gemini's response
-        if selected_model == "Gemini-Pro":
-            st.write(response.content)
-
-### STREAMING IDEA:
-"""from langchain_core.messages import HumanMessage
-
-inputs = {"messages": [HumanMessage(content="what *specifically* do I write in my .yml file to run black against my code upon a pull request? i want to make sure that black's formatting is automated in our CI/CD pipeline.")]}
-for output in app.stream(inputs):
-    # stream() yields dictionaries with output keyed by node name
-    for key, value in output.items():
-        print(f"Output from node '{key}':")
-        print("---")
-        print(value)
-    print("\n---\n")"""
+        user_query = {"messages": [HumanMessage(content=user_query)]}
+        for output in app.stream(user_query):
+            # stream() yields dictionaries with output keyed by node name
+            for key, value in output.items():
+                st.write(f"Output from node '{key}':")
+                st.markdown("---")
+                st.write(value)
+            st.markdown("\n---\n")
