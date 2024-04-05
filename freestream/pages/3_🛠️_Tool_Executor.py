@@ -7,19 +7,22 @@ import streamlit as st
 from langchain import hub
 from langchain.agents import load_tools
 from langchain.tools.retriever import create_retriever_tool
+from langchain_community.chat_message_histories import \
+    StreamlitChatMessageHistory
 from langchain_community.tools.tavily_search import TavilySearchResults
-from langchain_core.messages import BaseMessage, FunctionMessage
+from langchain_core.messages import BaseMessage, FunctionMessage, HumanMessage
 from langchain_core.utils.function_calling import convert_to_openai_function
-from langchain_openai import ChatOpenAI
-from langchain_openai import OpenAI
+from langchain_openai import ChatOpenAI, OpenAI
 from langgraph.graph import END, StateGraph
 from langgraph.prebuilt import ToolExecutor, ToolInvocation
-from pages import RetrieveDocuments
+from pages import RetrieveDocuments, StreamHandler, footer
 
 # Set up page config
 st.set_page_config(page_title="FreeStream: Tool Executor", page_icon="🛠️")
 
 st.title("🛠️ Tool Executor")
+# Show footer
+st.markdown(footer, unsafe_allow_html=True)
 
 os.environ["TAVILY_API_KEY"] = st.secrets.TAVILY.TAVILY_API_KEY
 
