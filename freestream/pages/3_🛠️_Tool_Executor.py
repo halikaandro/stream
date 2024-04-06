@@ -242,6 +242,13 @@ workflow.add_edge("action", "agent")
 # meaning you can use it as you would any other runnable
 app = workflow.compile()
 
+### NOTE TO SELF ###
+# `app` is basically `AgentExecutor` and I like how it prints the output
+# I want it to have memory: how do I achieve that?
+# Review these:
+### https://python.langchain.com/docs/modules/memory/agent_with_memory/
+######################
+
 ### Chat History ###
 # Setup memory for contextual conversation
 msgs = StreamlitChatMessageHistory()
