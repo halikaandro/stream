@@ -273,7 +273,9 @@ if user_query := st.chat_input(placeholder="Ask me anything!"):
         for output in app.stream(user_query):
             # stream() yields dictionaries with output keyed by node name
             for key, value in output.items():
-                st.write(f"Output from node '{key}':")
-                st.markdown("---")
-                st.write(value)
+
+                with st.expander(label=f"Output from node \"{key.upper()}\"", expanded=True):
+                    content = value['messages'][0].content
+                    st.markdown(content)
             st.markdown("\n---\n")
+    st.success("Done thinking.", icon="✅")
