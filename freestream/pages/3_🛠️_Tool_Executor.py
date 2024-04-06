@@ -59,6 +59,7 @@ model = ChatOpenAI(
     model="gpt-3.5-turbo",
     temperature=temperature_slider,
     openai_api_key=st.secrets.OPENAI.openai_api_key,
+    streaming=True,
 )
 
 # Set a model for tools
@@ -67,6 +68,7 @@ toollm = OpenAI(
     model="gpt-3.5-turbo",
     temperature=temperature_slider,
     openai_api_key=st.secrets.OPENAI.openai_api_key,
+    streaming=True,
 )
 
 # Instantiate tools
