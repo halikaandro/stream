@@ -32,7 +32,12 @@ st.markdown(footer, unsafe_allow_html=True)
 os.environ["TAVILY_API_KEY"] = st.secrets.TAVILY.TAVILY_API_KEY
 
 # Add a file upload button
-uploaded_files = st.sidebar.file_uploader(label="Upload your documentation", type=["doc", "docx"])
+uploaded_files = st.sidebar.file_uploader(
+    label="Upload a PDF or text file",
+    type=["pdf", "doc", "docx", "txt"],
+    help="Types supported: pdf, doc, docx, txt \n\nConsider the size of your files before you upload. Processing speed varies by server load.",
+    accept_multiple_files=True,
+)
 
 # Add temperature header
 temperature_header = st.sidebar.markdown(
