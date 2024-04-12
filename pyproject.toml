@@ -2,7 +2,7 @@
 
 name = "FreeStream"
 version = "4.1.0"
-description = "An effort to give easy access to generative AI."
+description = "Free AI Assistants."
 authors = ["Daethyra <109057945+Daethyra@users.noreply.github.com>"]
 readme = "README.md"
 license = "GNU AGPL"
