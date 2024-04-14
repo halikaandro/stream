@@ -2,7 +2,7 @@
 
 name = "FreeStream"
 version = "4.1.0"
-description = "An effort to give easy access to generative AI."
+description = "Free AI Assistants."
 authors = ["Daethyra <109057945+Daethyra@users.noreply.github.com>"]
 readme = "README.md"
 license = "GNU AGPL"
@@ -22,6 +22,10 @@ torch = { version = "^2.2.0", source = "torch" }
 opencv-python-headless = "^4.9.0.80"
 langchain-anthropic = "^0.1.4"
 realesrgan = {git = "https://github.com/sberbank-ai/Real-ESRGAN.git"}
+langgraph = "^0.0.31"
+numexpr = "^2.10.0"
+langchainhub = "^0.1.15"
+tavily-python = "^0.3.3"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.3.0"
