@@ -18,6 +18,7 @@ st.write(
 )
 st.divider()
 st.subheader("What tools are currently available?")
+st.caption("_:violet[GPT-4] & :violet[Claude Opus] have been :red[disabled] because grossly overused them when they :blue[should have used] a :green[smaller model]._ :orange[Larger models] were offered as drop-ins with the hopes that users would be :orange[cost-considerate].")
 st.write(
     """
     ### :blue[RAGbot]:

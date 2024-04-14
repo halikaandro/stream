@@ -76,14 +76,14 @@ model_names = {
         max_tokens=4096,  # Set the maximum number of tokens for the model's responses
         max_retries=1,  # Set the maximum number of retries for the model
     ),
-    "GPT-4 Turbo": ChatOpenAI(
-        model="gpt-4-0125-preview",
-        openai_api_key=st.secrets.OPENAI.openai_api_key,
-        temperature=temperature_slider,
-        streaming=True,
-        max_tokens=4096,
-        max_retries=1,
-    ),
+    # "GPT-4 Turbo": ChatOpenAI(
+    #     model="gpt-4-0125-preview",
+    #     openai_api_key=st.secrets.OPENAI.openai_api_key,
+    #     temperature=temperature_slider,
+    #     streaming=True,
+    #     max_tokens=4096,
+    #     max_retries=1,
+    # ),
     "Claude: Haiku": ChatAnthropic(
         model="claude-3-haiku-20240307",
         anthropic_api_key=st.secrets.ANTHROPIC.anthropic_api_key,
@@ -98,13 +98,13 @@ model_names = {
         streaming=True,
         max_tokens=4096,
     ),
-    "Claude: Opus": ChatAnthropic(
-        model="claude-3-opus-20240229",
-        anthropic_api_key=st.secrets.ANTHROPIC.anthropic_api_key,
-        temperature=temperature_slider,
-        streaming=True,
-        max_tokens=4096,
-    ),
+    # "Claude: Opus": ChatAnthropic(
+    #     model="claude-3-opus-20240229",
+    #     anthropic_api_key=st.secrets.ANTHROPIC.anthropic_api_key,
+    #     temperature=temperature_slider,
+    #     streaming=True,
+    #     max_tokens=4096,
+    # ),
     "Gemini-Pro": ChatGoogleGenerativeAI(
         model="gemini-pro",
         google_api_key=st.secrets.GOOGLE.google_api_key,
