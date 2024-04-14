@@ -62,7 +62,7 @@ model = ChatOpenAI(
 
 # Set a model for tools
 # Requires an 'LLM' not 'Chat Model'
-toollm = OpenAI(
+toollm = ChatOpenAI(
     model="gpt-3.5-turbo",
     temperature=temperature_slider,
     openai_api_key=st.secrets.OPENAI.openai_api_key,
