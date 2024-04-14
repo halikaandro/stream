@@ -263,8 +263,8 @@ if user_query := st.chat_input(placeholder="Ask me anything!"):
                         content = value['messages'][0].content
                         st.markdown(content)
                 else:
-                    with st.expander(label=f"Output from node \"{key.upper()}\"", expanded=True):
-                        content = value['messages'][0].content
-                        st.markdown(content)
+                    content = value['messages'][0].content
+                    st.markdown(f"""`Output from \"{key.upper()}\":`\n\n""" + content)
+                    # I really don't like this `app`. I'd rather use implement something compatible with `StreamlitCallbackhandler`
             st.markdown("\n---\n")
     st.success("Done thinking.", icon="✅")
