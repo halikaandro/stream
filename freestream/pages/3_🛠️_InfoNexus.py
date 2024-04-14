@@ -19,20 +19,22 @@ from langgraph.graph import END, StateGraph
 from langgraph.prebuilt import ToolExecutor, ToolInvocation
 from pages import RetrieveDocuments, StreamHandler, footer
 
-# Set up page config
-st.set_page_config(page_title="FreeStream: Tool Executor", page_icon="🛠️")
+# Initialize LangSmith tracing
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+os.environ["LANGCHAIN_PROJECT"] = "FreeStream-v4.0.0"
+os.environ["LANGCHAIN_ENDPOINT"] = st.secrets.LANGCHAIN.LANGCHAIN_ENDPOINT
+os.environ["LANGCHAIN_API_KEY"] = st.secrets.LANGCHAIN.LANGCHAIN_API_KEY
+os.environ["TAVILY_API_KEY"] = st.secrets.TAVILY.TAVILY_API_KEY
 
-st.title("🛠️ Tool Executor")
-st.subheader("Placeholder")
-st.caption(":violet[_Placeholder_]")
+# Set up page config
+st.set_page_config(page_title="FreeStream: InfoNexus", page_icon="🛠️")
+
+st.title("🛠️ InfoNexus")
+st.subheader(":green[Tavily Search Agent]")
+st.caption(":violet[Uses the Tavily Web Search Engine to Answer Your Questions.]")
 st.divider()
 # Show footer
 st.markdown(footer, unsafe_allow_html=True)
-
-os.environ["TAVILY_API_KEY"] = st.secrets.TAVILY.TAVILY_API_KEY
-
-# Add a file upload button
-uploaded_files = st.sidebar.file_uploader(label="Upload your documentation", type=["doc", "docx"])
 
 # Add temperature header
 temperature_header = st.sidebar.markdown(
@@ -69,22 +71,7 @@ toollm = OpenAI(
 
 # Instantiate tools
 tavily_search = TavilySearchResults()
-
-# Decide the contents of `toolbox` based on file upload
-if not uploaded_files:
-    toolbox = [tavily_search]
-else:
-    # Instantiate the retriever
-    retriever = RetrieveDocuments().configure_retriever(uploaded_files)
-    # Create a retrieval tool
-    retriever_tool = create_retriever_tool(
-        retriever,
-        "search_langchain_api_docs",
-        "Searches and returns Python API documentation.",
-    )
-    # Assort tools
-    toolbox = [tavily_search, retriever_tool]
-
+toolbox = [tavily_search]
 toolbox = toolbox + load_tools(tool_names=["llm-math"], llm=toollm)
 
 prompt = hub.pull("daethyra/openai-tools-agent")
@@ -271,9 +258,13 @@ if user_query := st.chat_input(placeholder="Ask me anything!"):
         for output in app.stream(user_query):
             # stream() yields dictionaries with output keyed by node name
             for key, value in output.items():
-
-                with st.expander(label=f"Output from node \"{key.upper()}\"", expanded=True):
-                    content = value['messages'][0].content
-                    st.markdown(content)
+                if key.upper() == "ACTION":
+                    with st.expander(label=f"EXECUTING \"{key.upper()}\"", expanded=False):
+                        content = value['messages'][0].content
+                        st.markdown(content)
+                else:
+                    with st.expander(label=f"Output from node \"{key.upper()}\"", expanded=True):
+                        content = value['messages'][0].content
+                        st.markdown(content)
             st.markdown("\n---\n")
     st.success("Done thinking.", icon="✅")
