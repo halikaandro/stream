@@ -91,13 +91,13 @@ model_names = {
         streaming=True,
         max_tokens=4096,
     ),
-    "Claude: Sonnet": ChatAnthropic(
-        model="claude-3-sonnet-20240229",
-        anthropic_api_key=st.secrets.ANTHROPIC.anthropic_api_key,
-        temperature=temperature_slider,
-        streaming=True,
-        max_tokens=4096,
-    ),
+    # "Claude: Sonnet": ChatAnthropic(
+    #     model="claude-3-sonnet-20240229",
+    #     anthropic_api_key=st.secrets.ANTHROPIC.anthropic_api_key,
+    #     temperature=temperature_slider,
+    #     streaming=True,
+    #     max_tokens=4096,
+    # ),
     # "Claude: Opus": ChatAnthropic(
     #     model="claude-3-opus-20240229",
     #     anthropic_api_key=st.secrets.ANTHROPIC.anthropic_api_key,
@@ -105,16 +105,16 @@ model_names = {
     #     streaming=True,
     #     max_tokens=4096,
     # ),
-    "Gemini-Pro": ChatGoogleGenerativeAI(
-        model="gemini-pro",
-        google_api_key=st.secrets.GOOGLE.google_api_key,
-        temperature=temperature_slider,
-        top_k=50,
-        top_p=0.7,
-        convert_system_message_to_human=True,
-        max_output_tokens=4096,
-        max_retries=1,
-    ),
+    # "Gemini-Pro": ChatGoogleGenerativeAI(
+    #     model="gemini-pro",
+    #     google_api_key=st.secrets.GOOGLE.google_api_key,
+    #     temperature=temperature_slider,
+    #     top_k=50,
+    #     top_p=0.7,
+    #     convert_system_message_to_human=True,
+    #     max_output_tokens=4096,
+    #     max_retries=1,
+    # ),
 }
 
 # Create a dropdown menu for selecting a chat model
