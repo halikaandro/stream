@@ -1,7 +1,7 @@
 [tool.poetry]
 
 name = "FreeStream"
-version = "4.1.1"
+version = "4.1.2"
 description = "Free AI Assistants."
 authors = ["Daethyra <109057945+Daethyra@users.noreply.github.com>"]
 readme = "README.md"
@@ -21,7 +21,7 @@ setuptools = "^69.1.0"
 torch = { version = "^2.2.0", source = "torch" }
 opencv-python-headless = "^4.9.0.80"
 langchain-anthropic = "^0.1.4"
-realesrgan = {git = "https://github.com/sberbank-ai/Real-ESRGAN.git"}
+# realesrgan = {git = "https://github.com/sberbank-ai/Real-ESRGAN.git"}
 langgraph = "^0.0.31"
 numexpr = "^2.10.0"
 langchainhub = "^0.1.15"
