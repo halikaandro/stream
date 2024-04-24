@@ -12,7 +12,6 @@ python = ">=3.10,<3.12"
 
 langchain = "^0.1.6"
 langchain-openai = "^0.0.7"
-langchain-google-genai = "^0.0.9"
 streamlit = "1.33.0"
 unstructured = {extras = ["all-docs"], version = "^0.12.4"}
 sentence-transformers = "^2.3.1"
@@ -21,7 +20,6 @@ setuptools = "^69.1.0"
 torch = { version = "^2.2.0", source = "torch" }
 opencv-python-headless = "^4.9.0.80"
 langchain-anthropic = "^0.1.4"
-# realesrgan = {git = "https://github.com/sberbank-ai/Real-ESRGAN.git"}
 langgraph = "^0.0.31"
 numexpr = "^2.10.0"
 langchainhub = "^0.1.15"
