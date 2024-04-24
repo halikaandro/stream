@@ -16,7 +16,6 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.callbacks.base import BaseCallbackHandler
 from langchain_core.documents import Document
 from PIL import Image
-from RealESRGAN import RealESRGAN
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
@@ -119,72 +118,72 @@ def set_llm(selected_model: str, model_names: dict):
         st.error(f"Failed to change model! Error: {e}\n{selected_model}")
 
 
-# Define a dictionary for Real-ESRGAN's model weights
-upscale_model_weights = {
-    2: "weights/RealESRGAN_x2plus.pth",
-    4: "weights/RealESRGAN_x4plus.pth",
-    # 8: "weights/RealESRGAN_x8plus.pth",
-}
+# # Define a dictionary for Real-ESRGAN's model weights
+# upscale_model_weights = {
+#     2: "weights/RealESRGAN_x2plus.pth",
+#     4: "weights/RealESRGAN_x4plus.pth",
+#     # 8: "weights/RealESRGAN_x8plus.pth",
+# }
 
 
-# Define a function to upscale images using Real-ESRGAN
-def image_upscaler(image: str, scale: int) -> Image:
-    """
-    Upscales the input image using the specified model and returns the upscaled image.
+# # Define a function to upscale images using Real-ESRGAN
+# def image_upscaler(image: str, scale: int) -> Image:
+#     """
+#     Upscales the input image using the specified model and returns the upscaled image.
 
-    Parameters:
-    image (str): The file path of the input image.
+#     Parameters:
+#     image (str): The file path of the input image.
 
-    Returns:
-    Image: The upscaled image.
-    """
+#     Returns:
+#     Image: The upscaled image.
+#     """
 
-    # Assign the image to a variable
-    img = Image.open(image).convert("RGB")
+#     # Assign the image to a variable
+#     img = Image.open(image).convert("RGB")
 
-    # Initialize the upscaler
-    upscaler = RealESRGAN(
-        device="cuda" if torch.cuda.is_available() else "cpu", scale=scale
-    )
+#     # Initialize the upscaler
+#     upscaler = RealESRGAN(
+#         device="cuda" if torch.cuda.is_available() else "cpu", scale=scale
+#     )
 
-    # Load the corresponding model weight
-    if scale in upscale_model_weights:
-        upscaler.load_weights(
-            upscale_model_weights[scale],
-            # Download the model weight if it doesn't exist
-            download=True,
-        )
-    else:
-        logger.error("Scale factor not in supported model weights.")
+#     # Load the corresponding model weight
+#     if scale in upscale_model_weights:
+#         upscaler.load_weights(
+#             upscale_model_weights[scale],
+#             # Download the model weight if it doesn't exist
+#             download=True,
+#         )
+#     else:
+#         logger.error("Scale factor not in supported model weights.")
 
-    try:
-        # Capture start time
-        start_time = datetime.datetime.now()
+#     try:
+#         # Capture start time
+#         start_time = datetime.datetime.now()
 
-        with st.spinner(
-            f"Began upscaling: {datetime.datetime.now().strftime('%H:%M:%S')}..."
-        ):
-            # Upscale the image
-            upscaled_img = upscaler.predict(img)
+#         with st.spinner(
+#             f"Began upscaling: {datetime.datetime.now().strftime('%H:%M:%S')}..."
+#         ):
+#             # Upscale the image
+#             upscaled_img = upscaler.predict(img)
 
-        # Capture end time
-        end_time = datetime.datetime.now()
+#         # Capture end time
+#         end_time = datetime.datetime.now()
 
-        # Calculate  and log the process duration
-        process_duration = end_time - start_time
-        logger.info(f"Upscale process took {process_duration.total_seconds()} seconds.")
+#         # Calculate  and log the process duration
+#         process_duration = end_time - start_time
+#         logger.info(f"Upscale process took {process_duration.total_seconds()} seconds.")
 
-        # Notify the user
-        st.toast(
-            f"Success! Upscaling took {process_duration.total_seconds()} seconds.",
-            icon="😄",
-        )
+#         # Notify the user
+#         st.toast(
+#             f"Success! Upscaling took {process_duration.total_seconds()} seconds.",
+#             icon="😄",
+#         )
 
-    except Exception as e:
-        logger.error(f"Failed to upscale image. Error: {e}")
-        st.error(f"Failed to upscale image! Please try again.")
+#     except Exception as e:
+#         logger.error(f"Failed to upscale image. Error: {e}")
+#         st.error(f"Failed to upscale image! Please try again.")
 
-    return upscaled_img
+#     return upscaled_img
 
 
 # Define a function to change the background to an image via URL
