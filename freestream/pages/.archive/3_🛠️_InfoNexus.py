@@ -6,6 +6,7 @@ from typing import Annotated, Sequence, TypedDict
 import streamlit as st
 from langchain import hub
 from langchain.agents import load_tools
+from langchain.memory import ChatMessageHistory, ConversationBufferMemory
 from langchain.tools.retriever import create_retriever_tool
 from langchain_community.callbacks import StreamlitCallbackHandler
 from langchain_community.chat_message_histories import \
@@ -13,6 +14,7 @@ from langchain_community.chat_message_histories import \
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.messages import BaseMessage, FunctionMessage, HumanMessage
 from langchain_core.runnables import RunnableConfig
+from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.utils.function_calling import convert_to_openai_function
 from langchain_openai import ChatOpenAI, OpenAI
 from langgraph.graph import END, StateGraph
@@ -30,8 +32,8 @@ os.environ["TAVILY_API_KEY"] = st.secrets.TAVILY.TAVILY_API_KEY
 st.set_page_config(page_title="FreeStream: InfoNexus", page_icon="🛠️")
 
 st.title("🛠️ InfoNexus")
-st.subheader(":green[Tavily Search Agent]")
-st.caption(":violet[Uses the Tavily Web Search Engine to Answer Your Questions.]")
+st.subheader(":green[Leverages Tavily Web Search to Answer Questions.]")
+st.caption(":violet[Powered by GPT-3.5-Turbo]")
 st.divider()
 # Show footer
 st.markdown(footer, unsafe_allow_html=True)
@@ -225,19 +227,21 @@ workflow.add_edge("action", "agent")
 # meaning you can use it as you would any other runnable
 app = workflow.compile()
 
-### NOTE TO SELF ###
-# `app` is basically `AgentExecutor` and I like how it prints the output
-# I want it to have memory: how do I achieve that?
-# Review these:
-### https://python.langchain.com/docs/modules/memory/agent_with_memory/
-######################
-
-### Chat History ###
 # Setup memory for contextual conversation
 msgs = StreamlitChatMessageHistory()
-# if the length of messages is 0, or when the user \
-# clicks the clear button,
-# show a default message from the AI
+memory = ConversationBufferMemory(
+    memory_key="chat_history", chat_memory=msgs, return_messages=True
+)
+
+memory = ChatMessageHistory(session_id="test-session")
+agent_with_chat_history = RunnableWithMessageHistory(
+    app,
+    lambda session_id: memory,
+    input_messages_key="input",
+    history_messages_key="chat_history",
+)
+
+# Button to clear conversation history
 if st.sidebar.button("Clear message history"):
     msgs.clear()
 
@@ -251,20 +255,23 @@ output_container = st.empty()
 # Display user input field and enter button
 if user_query := st.chat_input(placeholder="Ask me anything!"):
     st.chat_message("user").write(user_query)
-    
+
     # Display assistant response
     with st.chat_message("assistant"):
         user_query = {"messages": [HumanMessage(content=user_query)]}
-        for output in app.stream(user_query):
+        for output in agent_with_chat_history.stream(
+            user_query, config={"configurable": {"session_id": "placeholder_id"}}
+        ):
             # stream() yields dictionaries with output keyed by node name
             for key, value in output.items():
                 if key.upper() == "ACTION":
-                    with st.expander(label=f"EXECUTING \"{key.upper()}\"", expanded=False):
-                        content = value['messages'][0].content
+                    with st.expander(
+                        label=f'EXECUTING "{key.upper()}"', expanded=False
+                    ):
+                        content = value["messages"][0].content
                         st.markdown(content)
                 else:
-                    content = value['messages'][0].content
+                    content = value["messages"][0].content
                     st.markdown(f"""`Output from \"{key.upper()}\":`\n\n""" + content)
-                    # I really don't like this `app`. I'd rather use implement something compatible with `StreamlitCallbackhandler`
             st.markdown("\n---\n")
     st.success("Done thinking.", icon="✅")
