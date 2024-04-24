@@ -3,11 +3,11 @@ import streamlit as st
 from freestream import footer
 
 st.set_page_config(
-    page_title="FreeStream: Unlimited Access to AI Tools", page_icon="🏡"
+    page_title="FreeStream: Chatbots for specific use-cases", page_icon="🏡"
 )
 
 st.title("FreeStream")
-st.header(":green[_Unlimited Access to AI Tools_]", divider="red")
+st.header(":green[_Chatbots, tuned for specific use-cases_]", divider="red")
 # Project Overview
 st.subheader(":blue[What is FreeStream?]")
 # Show footer
@@ -16,7 +16,7 @@ st.markdown(footer, unsafe_allow_html=True)
 
 st.write(
     """
-    Generative AI tools may seem complex or intimidating, but the current reality is much different. Through FreeStream, you'll realize how accessible and understandable AI really is, and learn how it can serve in your daily life.
+    FreeStream is a collection of chatbots that are tuned for specific use-cases.
     """
 )
 st.divider()
@@ -25,13 +25,13 @@ st.write(
     """
     ### :blue[RAGbot]:
     
-    :orange[*RAGbot can answer your questions directly from the documents you provide.*]
+    :orange[*RAGbot searches files you upload for answers to your questions.*]
     
     The first chatbot made for FreeStream was RAGbot. It's great for asking specific questions about long policy documents, summarizing the contents of an article, or synthesizing knowledge from multiple sources, such as legal or scientific documents. You may to upload however many PDFs, Word documents, or plain text files you'd like. You can then pose specific questions directly related to the content of your documents.
     """
 )
 
-with st.expander(label=":violet[How does RAGbot work under the hood?]", expanded=False):
+with st.expander(label=":violet[RAGbot workflow:]", expanded=False):
     st.markdown(
         """
         1. Upload Documents:  Upload your documents to RAGbot.
@@ -61,7 +61,7 @@ st.write(
     """
 )
 
-with st.expander(label=":violet[Why would I want to use this chatbot]", expanded=False):
+with st.expander(label=":violet[System Prompt:]", expanded=False):
     st.markdown(
         """
         *You are a friendly AI chatbot designed to assist users in comprehending reality, exploring their curiosity, and practicing critical thinking skills. Your role is to guide users towards the right answers by providing thoughtful, well-reasoned responses. When faced with a question, decompose the problem into smaller, manageable parts and reason through each step systematically. This approach will help you provide comprehensive and accurate answers. Remember, your goal is to enhance learning and understanding, so only provide direct advice when explicitly asked to do so. Always strive to provide responses that are relevant, accurate, and contextually appropriate.*
@@ -79,13 +79,11 @@ st.write(
     For now, it only has the Tavily Search API, which is a "search engine built specifically for AI agents (LLMs), delivering real-time, accurate, and factual results at speed." This chatbot is a work in progress, and currently non-conversational, which means it can only answer questions in a single-shot fashion, and cannot remember previous queries.
     """
 )
-with st.expander(label=":violet[What's an 'Agent'?]", expanded=False):
+with st.expander(label=":violet['Agent' description:]", expanded=False):
     st.markdown("""
         The AI assistant is therefore an "Agent" because it decides when to use a tool based on its ability to answer the user appropriately. This agent is then operated as a "State machine" in the sense that the underlying large language model changes the contents of the "state" based on the output of a node. Think of nodes as points in the AI's workflow.
         """
     )
-# spot to put the workflow diagram
-# will use Miro
     
 st.write(
     """
