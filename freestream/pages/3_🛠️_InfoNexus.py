@@ -30,8 +30,8 @@ os.environ["TAVILY_API_KEY"] = st.secrets.TAVILY.TAVILY_API_KEY
 st.set_page_config(page_title="FreeStream: InfoNexus", page_icon="🛠️")
 
 st.title("🛠️ InfoNexus")
-st.subheader(":green[Tavily Search Agent]")
-st.caption(":violet[Uses the Tavily Web Search Engine to Answer Your Questions.]")
+st.subheader(":green[Leverages Tavily Web Search to Answer Questions.]")
+st.caption(":violet[Powered by GPT-3.5-Turbo]")
 st.divider()
 # Show footer
 st.markdown(footer, unsafe_allow_html=True)
