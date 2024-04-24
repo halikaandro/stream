@@ -101,13 +101,13 @@ model_names = {
         streaming=True,
         max_tokens=4096,
     ),
-    "Claude: Opus": ChatAnthropic(
-        model="claude-3-opus-20240229",
-        anthropic_api_key=st.secrets.ANTHROPIC.anthropic_api_key,
-        temperature=temperature_slider,
-        streaming=True,
-        max_tokens=4096,
-    ),
+    # "Claude: Opus": ChatAnthropic(
+    #     model="claude-3-opus-20240229",
+    #     anthropic_api_key=st.secrets.ANTHROPIC.anthropic_api_key,
+    #     temperature=temperature_slider,
+    #     streaming=True,
+    #     max_tokens=4096,
+    # ),
 }
 
 # Create a dropdown menu for selecting a chat model
