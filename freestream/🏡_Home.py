@@ -80,20 +80,11 @@ st.write(
     """
 )
 with st.expander(label=":violet['Agent' description:]", expanded=False):
-    st.markdown("""
+    st.markdown(
+        """
         The AI assistant is therefore an "Agent" because it decides when to use a tool based on its ability to answer the user appropriately. This agent is then operated as a "State machine" in the sense that the underlying large language model changes the contents of the "state" based on the output of a node. Think of nodes as points in the AI's workflow.
         """
     )
-    
-st.write(
-    """
-    ### :blue[Real-ESRGAN]:
-    
-    :orange[An image upscaler trained on "pure synthetic data." ]
-    
-    Real-ESRGAN usually powers image upscaling on those websites with free microservices that limit usage before asking for payment or sign up. We'll never do that here. Normally, Real-ESRGAN is capable of upscaling to arbitrary values, however due to the lack of GPU support on Streamlit Community Cloud, the application may crash if you try upscaling too large of an image or too large of a scale factor.
-    """
-)
 
 st.divider()
 
@@ -108,4 +99,3 @@ st.markdown(
 )
 
 st.divider()
-
