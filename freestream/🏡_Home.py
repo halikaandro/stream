@@ -68,24 +68,6 @@ with st.expander(label=":violet[System Prompt:]", expanded=False):
         """
     )
 
-st.write(
-    """
-    ### :blue[InfoNexus]:
-    
-    :orange[*The InfoNexus is an agent-based chatbot that thinks in cycles in order to accomplish answer a user's query.*]
-    
-    In the typical chatbot pages, your AI assistant would perform a set of actions in a linear fashion, one time through. InfoNexus is different because it operates off of a predefined workflow, which allows it to work in cycles, meaning it can decide what to do based on its available set of tools.
-    
-    For now, it only has the Tavily Search API, which is a "search engine built specifically for AI agents (LLMs), delivering real-time, accurate, and factual results at speed." This chatbot is a work in progress, and currently non-conversational, which means it can only answer questions in a single-shot fashion, and cannot remember previous queries.
-    """
-)
-with st.expander(label=":violet['Agent' description:]", expanded=False):
-    st.markdown(
-        """
-        The AI assistant is therefore an "Agent" because it decides when to use a tool based on its ability to answer the user appropriately. This agent is then operated as a "State machine" in the sense that the underlying large language model changes the contents of the "state" based on the output of a node. Think of nodes as points in the AI's workflow.
-        """
-    )
-
 st.divider()
 
 st.markdown(
