@@ -6,7 +6,7 @@ from typing import Annotated, Sequence, TypedDict
 import streamlit as st
 from langchain import hub
 from langchain.agents import load_tools
-from langchain.memory import ConversationBufferMemory
+from langchain.memory import ChatMessageHistory, ConversationBufferMemory
 from langchain.tools.retriever import create_retriever_tool
 from langchain_community.callbacks import StreamlitCallbackHandler
 from langchain_community.chat_message_histories import \
@@ -232,7 +232,7 @@ msgs = StreamlitChatMessageHistory()
 memory = ConversationBufferMemory(
     memory_key="chat_history", chat_memory=msgs, return_messages=True
 )
-from langchain.memory import ChatMessageHistory
+
 memory = ChatMessageHistory(session_id="test-session")
 agent_with_chat_history = RunnableWithMessageHistory(
     app,
@@ -255,20 +255,23 @@ output_container = st.empty()
 # Display user input field and enter button
 if user_query := st.chat_input(placeholder="Ask me anything!"):
     st.chat_message("user").write(user_query)
-    
+
     # Display assistant response
     with st.chat_message("assistant"):
         user_query = {"messages": [HumanMessage(content=user_query)]}
-        for output in agent_with_chat_history.stream(user_query, config={"configurable": {"session_id": "placeholder_id"}}):
+        for output in agent_with_chat_history.stream(
+            user_query, config={"configurable": {"session_id": "placeholder_id"}}
+        ):
             # stream() yields dictionaries with output keyed by node name
             for key, value in output.items():
                 if key.upper() == "ACTION":
-                    with st.expander(label=f"EXECUTING \"{key.upper()}\"", expanded=False):
-                        content = value['messages'][0].content
+                    with st.expander(
+                        label=f'EXECUTING "{key.upper()}"', expanded=False
+                    ):
+                        content = value["messages"][0].content
                         st.markdown(content)
                 else:
-                    content = value['messages'][0].content
+                    content = value["messages"][0].content
                     st.markdown(f"""`Output from \"{key.upper()}\":`\n\n""" + content)
-                    # I really don't like this `app`. I'd rather use implement something compatible with `StreamlitCallbackhandler`
             st.markdown("\n---\n")
     st.success("Done thinking.", icon="✅")
