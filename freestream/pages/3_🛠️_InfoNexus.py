@@ -6,6 +6,7 @@ from typing import Annotated, Sequence, TypedDict
 import streamlit as st
 from langchain import hub
 from langchain.agents import load_tools
+from langchain.memory import ConversationBufferMemory
 from langchain.tools.retriever import create_retriever_tool
 from langchain_community.callbacks import StreamlitCallbackHandler
 from langchain_community.chat_message_histories import \
@@ -13,6 +14,7 @@ from langchain_community.chat_message_histories import \
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.messages import BaseMessage, FunctionMessage, HumanMessage
 from langchain_core.runnables import RunnableConfig
+from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.utils.function_calling import convert_to_openai_function
 from langchain_openai import ChatOpenAI, OpenAI
 from langgraph.graph import END, StateGraph
@@ -225,19 +227,21 @@ workflow.add_edge("action", "agent")
 # meaning you can use it as you would any other runnable
 app = workflow.compile()
 
-### NOTE TO SELF ###
-# `app` is basically `AgentExecutor` and I like how it prints the output
-# I want it to have memory: how do I achieve that?
-# Review these:
-### https://python.langchain.com/docs/modules/memory/agent_with_memory/
-######################
-
-### Chat History ###
 # Setup memory for contextual conversation
 msgs = StreamlitChatMessageHistory()
-# if the length of messages is 0, or when the user \
-# clicks the clear button,
-# show a default message from the AI
+memory = ConversationBufferMemory(
+    memory_key="chat_history", chat_memory=msgs, return_messages=True
+)
+from langchain.memory import ChatMessageHistory
+memory = ChatMessageHistory(session_id="test-session")
+agent_with_chat_history = RunnableWithMessageHistory(
+    app,
+    lambda session_id: memory,
+    input_messages_key="input",
+    history_messages_key="chat_history",
+)
+
+# Button to clear conversation history
 if st.sidebar.button("Clear message history"):
     msgs.clear()
 
@@ -255,7 +259,7 @@ if user_query := st.chat_input(placeholder="Ask me anything!"):
     # Display assistant response
     with st.chat_message("assistant"):
         user_query = {"messages": [HumanMessage(content=user_query)]}
-        for output in app.stream(user_query):
+        for output in agent_with_chat_history.stream(user_query, config={"configurable": {"session_id": "placeholder_id"}}):
             # stream() yields dictionaries with output keyed by node name
             for key, value in output.items():
                 if key.upper() == "ACTION":
