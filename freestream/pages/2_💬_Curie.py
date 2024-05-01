@@ -155,7 +155,7 @@ for msg in msgs.messages:
 # Create a sidebar button to download the conversation history
 st.sidebar.download_button(
     label="Download \n\nconversation history",
-    data=save_conversation_history(),
+    data=save_conversation_history(msgs.messages),
     file_name="conversation_history.txt",
     mime="text/plain",
     key="download_conversation_history_button",
