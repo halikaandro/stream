@@ -235,14 +235,24 @@ def set_bg_local(main_bg):
     )
 
 # Create a function to save the conversation history to a file
-def save_conversation_history():
+def save_conversation_history(conversation_history: List[Any]) -> str:
     """
-    Save the conversation history to a text file with some eye-easy formatting.
-    
-    `st.session_state.chat_history` is used as the memory key in both RAGbot and Curie.
-    
+    Utility function to format and prepare the conversation history for download.
+
+    Parameters:
+    conversation_history (list): List of dictionaries containing the conversation history.
+
+    Returns:
+    str: Formatted conversation history ready for download.
     """
-    st.write(st.session_state.chat_history)
+    formatted_history = ""
+    for msg in conversation_history:
+        if msg['type'] == 'human':
+            formatted_history += f"Human: {msg['content']}\n\n"
+        elif msg['type'] == 'ai':
+            formatted_history += f"Assistant: {msg['content']}\n\n"
+
+    return formatted_history
 
 
 ################################
