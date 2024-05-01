@@ -33,16 +33,6 @@ st.markdown(footer, unsafe_allow_html=True)
 # Add sidebar
 st.sidebar.subheader("__User Panel__")
 
-# Create a on/off switch for the GIF background
-gif_bg = st.sidebar.toggle(
-    label="Rain Background",
-    value=False,
-    key="gif_background",
-    help="Turn on an experimental background.",
-)
-if gif_bg:
-    set_bg_local("assets/62.gif")
-
 # Add temperature header
 temperature_header = st.sidebar.markdown(
     """
@@ -150,6 +140,18 @@ chain_with_history = RunnableWithMessageHistory(
 avatars = {"human": "user", "ai": "assistant"}
 for msg in msgs.messages:
     st.chat_message(avatars[msg.type]).write(msg.content)
+
+## Create an on/off switch for the GIF background
+st.sidebar.divider()
+# Define a GIF toggle
+gif_bg = st.sidebar.toggle(
+    label="Rain Background",
+    value=False,
+    key="gif_background",
+    help="Turn on an experimental background.",
+)
+if gif_bg:
+    set_bg_local("assets/62.gif")
 
 # Display user input field and enter button
 if user_query := st.chat_input(placeholder="Ask me anything!"):
