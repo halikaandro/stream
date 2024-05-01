@@ -180,6 +180,3 @@ if user_query := st.chat_input(placeholder="Ask me anything!"):
                 "callbacks": [stream_handler],
             },
         )
-        # Force print Gemini's response
-        if selected_model == "Gemini-Pro":
-            st.write(response.content)

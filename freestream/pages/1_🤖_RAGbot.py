@@ -159,6 +159,3 @@ if user_query := st.chat_input(placeholder="Ask me anything!"):
         response = qa_chain.run(
             user_query, callbacks=[retrieval_handler, stream_handler]
         )
-        # Force print Gemini's response
-        if selected_model == "Gemini-Pro":
-            st.write(response)
