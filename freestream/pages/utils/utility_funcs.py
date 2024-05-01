@@ -234,6 +234,16 @@ def set_bg_local(main_bg):
         unsafe_allow_html=True,
     )
 
+# Create a function to save the conversation history to a file
+def save_conversation_history():
+    """
+    Save the conversation history to a text file with some eye-easy formatting.
+    
+    `st.session_state.chat_history` is used as the memory key in both RAGbot and Curie.
+    
+    """
+    st.write(st.session_state.chat_history)
+
 
 ################################
 ### CUSTOM CALLBACK HANDLERS ###

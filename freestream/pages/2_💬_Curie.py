@@ -15,6 +15,7 @@ from pages import (
     footer,
     set_bg_local,
     set_llm,
+    save_conversation_history,
 )
 
 # Initialize LangSmith tracing
@@ -145,6 +146,10 @@ chain_with_history = RunnableWithMessageHistory(
     input_messages_key="question",
     history_messages_key="chat_history",
 )
+
+# Download the conversation history
+if st.sidebar.button("Download \n\nconversation history"):
+    save_conversation_history()
 
 # Display coversation history window
 avatars = {"human": "user", "ai": "assistant"}
