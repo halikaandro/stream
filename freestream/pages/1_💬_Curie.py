@@ -1,22 +1,17 @@
+import datetime
 import os
 
 import streamlit as st
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from langchain_anthropic import ChatAnthropic
-from langchain_community.chat_message_histories import StreamlitChatMessageHistory
+from langchain_community.chat_message_histories import \
+    StreamlitChatMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_openai import ChatOpenAI
-from pages import (
-    PrintRetrievalHandler,
-    RetrieveDocuments,
-    StreamHandler,
-    footer,
-    set_bg_local,
-    set_llm,
-    save_conversation_history,
-)
+from pages import (PrintRetrievalHandler, RetrieveDocuments, StreamHandler,
+                   footer, save_conversation_history, set_bg_local, set_llm)
 
 # Initialize LangSmith tracing
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
@@ -142,19 +137,6 @@ avatars = {"human": "user", "ai": "assistant"}
 for msg in msgs.messages:
     st.chat_message(avatars[msg.type]).write(msg.content)
 
-# Save the formatted conversation history to a variable
-formatted_history = save_conversation_history(msgs.messages)
-# Create a sidebar button to download the conversation history
-st.sidebar.download_button(
-    label="Download conversation history",
-    data=formatted_history,
-    file_name="conversation_history.txt",
-    mime="text/plain",
-    key="download_conversation_history_button",
-    help="Download the conversation history as a text file with some formatting.",
-    use_container_width=True,   
-)
-
 # Display user input field and enter button
 if user_query := st.chat_input(placeholder="What's on your mind?"):
     st.chat_message("user").write(user_query)
@@ -170,6 +152,20 @@ if user_query := st.chat_input(placeholder="What's on your mind?"):
                 "callbacks": [stream_handler],
             },
         )
+
+# Save the formatted conversation history to a variable
+formatted_history = save_conversation_history(msgs.messages)
+current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+# Create a sidebar button to download the conversation history
+st.sidebar.download_button(
+    label="Download conversation history",
+    data=formatted_history,
+    file_name=f"conversation_history {current_time}.txt",
+    mime="text/plain",
+    key="download_conversation_history_button",
+    help="Download the conversation history as a text file with some formatting.",
+    use_container_width=True,   
+)
 
 ## Create an on/off switch for the GIF background
 st.sidebar.divider()

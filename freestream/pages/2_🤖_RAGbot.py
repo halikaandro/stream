@@ -12,6 +12,8 @@ from pages import (
     RetrieveDocuments,
     set_llm,
     footer,
+    set_bg_local,
+    save_conversation_history,
 )
 
 # Initialize LangSmith tracing
@@ -130,10 +132,6 @@ qa_chain = ConversationalRetrievalChain.from_llm(
     llm, retriever=retriever, memory=memory, verbose=True
 )
 
-# Define a button to clear the conversation history
-if len(msgs.messages) == 0 or st.sidebar.button("Clear message history"):
-    msgs.clear()
-
 # Display coversation history window
 avatars = {"human": "user", "ai": "assistant"}
 for msg in msgs.messages:
@@ -150,6 +148,20 @@ if user_query := st.chat_input(placeholder="Ask me about your documents!"):
         response = qa_chain.run(
             user_query, callbacks=[retrieval_handler, stream_handler]
         )
+
+# Save the formatted conversation history to a variable
+formatted_history = save_conversation_history(msgs.messages)
+current_time = datetime.datetime.now().strftime("%H:%M:%S_%m_%d_%Y")
+# Create a sidebar button to download the conversation history
+st.sidebar.download_button(
+    label="Download conversation history",
+    data=formatted_history,
+    file_name=f"conversation_history_{current_time}.txt",
+    mime="text/plain",
+    key="download_conversation_history_button",
+    help="Download the conversation history as a text file with some formatting.",
+    use_container_width=True,   
+)
 
 ## Create an on/off switch for the GIF background
 st.sidebar.divider()
