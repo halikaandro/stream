@@ -126,10 +126,7 @@ qa_chain = ConversationalRetrievalChain.from_llm(
     llm, retriever=retriever, memory=memory, verbose=True
 )
 
-### Chat History ###
-# if the length of messages is 0, or when the user \
-# clicks the clear button,
-# show a default message from the AI
+# Define a button to clear the conversation history
 if len(msgs.messages) == 0 or st.sidebar.button("Clear message history"):
     msgs.clear()
 
@@ -138,8 +135,20 @@ avatars = {"human": "user", "ai": "assistant"}
 for msg in msgs.messages:
     st.chat_message(avatars[msg.type]).write(msg.content)
 
+## Create an on/off switch for the GIF background
+st.sidebar.divider()
+# Define a GIF toggle
+gif_bg = st.sidebar.toggle(
+    label="Rain Background",
+    value=False,
+    key="gif_background",
+    help="Turn on an experimental background.",
+)
+if gif_bg:
+    set_bg_local("assets/62.gif")
+    
 # Display user input field and enter button
-if user_query := st.chat_input(placeholder="Ask me anything!"):
+if user_query := st.chat_input(placeholder="Ask me about your documents!"):
     st.chat_message("user").write(user_query)
 
     # Display assistant response
