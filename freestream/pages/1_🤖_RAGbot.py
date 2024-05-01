@@ -65,6 +65,10 @@ memory = ConversationBufferMemory(
     memory_key="chat_history", chat_memory=msgs, return_messages=True
 )
 
+# Button to clear conversation history
+if st.sidebar.button("Clear message history"):
+    msgs.clear()
+
 # Create a dictionary with keys to chat model classes
 model_names = {
     "GPT-3.5 Turbo": ChatOpenAI(  # Define a dictionary entry for the "ChatOpenAI GPT-3.5 Turbo" model
@@ -125,13 +129,6 @@ llm = model_names[
 qa_chain = ConversationalRetrievalChain.from_llm(
     llm, retriever=retriever, memory=memory, verbose=True
 )
-
-### Chat History ###
-# if the length of messages is 0, or when the user \
-# clicks the clear button,
-# show a default message from the AI
-if len(msgs.messages) == 0 or st.sidebar.button("Clear message history"):
-    msgs.clear()
 
 # Display coversation history window
 avatars = {"human": "user", "ai": "assistant"}
