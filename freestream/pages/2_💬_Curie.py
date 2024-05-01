@@ -152,16 +152,18 @@ avatars = {"human": "user", "ai": "assistant"}
 for msg in msgs.messages:
     st.chat_message(avatars[msg.type]).write(msg.content)
 
+# Save the formatted conversation history to a variable
+formatted_history = save_conversation_history(msgs.messages)
 # Create a sidebar button to download the conversation history
 st.sidebar.download_button(
     label="Download \n\nconversation history",
-    data=save_conversation_history(msgs.messages),
+    data=formatted_history,
     file_name="conversation_history.txt",
     mime="text/plain",
     key="download_conversation_history_button",
     help="Download the conversation history as a text file with some formatting.",
     use_container_width=False,   
-)    
+)
 
 # Display user input field and enter button
 if user_query := st.chat_input(placeholder="Ask me anything!"):
