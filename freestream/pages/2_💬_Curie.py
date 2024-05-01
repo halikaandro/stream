@@ -34,16 +34,6 @@ st.markdown(footer, unsafe_allow_html=True)
 # Add sidebar
 st.sidebar.subheader("__User Panel__")
 
-# Create a on/off switch for the GIF background
-gif_bg = st.sidebar.toggle(
-    label="Rain Background",
-    value=False,
-    key="gif_background",
-    help="Turn on an experimental background.",
-)
-if gif_bg:
-    set_bg_local("assets/62.gif")
-
 # Add temperature header
 temperature_header = st.sidebar.markdown(
     """
@@ -152,6 +142,18 @@ avatars = {"human": "user", "ai": "assistant"}
 for msg in msgs.messages:
     st.chat_message(avatars[msg.type]).write(msg.content)
 
+## Create an on/off switch for the GIF background
+st.sidebar.divider()
+# Define a GIF toggle
+gif_bg = st.sidebar.toggle(
+    label="Rain Background",
+    value=False,
+    key="gif_background",
+    help="Turn on an experimental background.",
+)
+if gif_bg:
+    set_bg_local("assets/62.gif")
+
 # Save the formatted conversation history to a variable
 formatted_history = save_conversation_history(msgs.messages)
 # Create a sidebar button to download the conversation history
@@ -166,7 +168,7 @@ st.sidebar.download_button(
 )
 
 # Display user input field and enter button
-if user_query := st.chat_input(placeholder="Ask me anything!"):
+if user_query := st.chat_input(placeholder="What's on your mind?"):
     st.chat_message("user").write(user_query)
 
     # Display assistant response
