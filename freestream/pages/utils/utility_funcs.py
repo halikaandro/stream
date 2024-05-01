@@ -240,24 +240,19 @@ def save_conversation_history(conversation_history: List[Any]) -> str:
     Utility function to format and prepare the conversation history for download.
 
     Parameters:
-    conversation_history (list): List of dictionaries containing the conversation history.
+    conversation_history (List[Any]): List of objects containing the conversation history.
 
     Returns:
     str: Formatted conversation history ready for download.
     """
-    # Check the type of the messages attribute
-    if conversation_history:
-        print(f"Type of messages attribute: {type(conversation_history[0])}")
-        
     formatted_history = ""
     for msg in conversation_history:
-        if msg['type'] == 'human':
-            formatted_history += f"Human: {msg['content']}\n\n"
-        elif msg['type'] == 'ai':
-            formatted_history += f"Assistant: {msg['content']}\n\n"
+        if msg.type == 'human':
+            formatted_history += f"Human: {msg.content}\n\n"
+        elif msg.type == 'ai':
+            formatted_history += f"Assistant: {msg.content}\n\n"
 
     return formatted_history
-
 
 ################################
 ### CUSTOM CALLBACK HANDLERS ###
