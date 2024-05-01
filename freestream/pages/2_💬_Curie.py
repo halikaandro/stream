@@ -154,7 +154,7 @@ if gif_bg:
     set_bg_local("assets/62.gif")
 
 # Display user input field and enter button
-if user_query := st.chat_input(placeholder="Ask me anything!"):
+if user_query := st.chat_input(placeholder="What's on your mind?"):
     st.chat_message("user").write(user_query)
 
     # Display assistant response
