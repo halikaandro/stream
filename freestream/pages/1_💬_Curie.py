@@ -20,9 +20,9 @@ os.environ["LANGCHAIN_ENDPOINT"] = st.secrets.LANGCHAIN.LANGCHAIN_ENDPOINT
 os.environ["LANGCHAIN_API_KEY"] = st.secrets.LANGCHAIN.LANGCHAIN_API_KEY
 
 # Set up page config
-st.set_page_config(page_title="FreeStream: Chatbot", page_icon="💬")
+st.set_page_config(page_title="FreeStream: Curie", page_icon="💬")
 st.title("💬Chatbot")
-st.header(":green[_General Use Chatbot_]", divider="red")
+st.header(":green[_General Purpose Chatbot_]", divider="red")
 # Show footer
 st.markdown(footer, unsafe_allow_html=True)
 
@@ -40,7 +40,7 @@ temperature_slider = st.sidebar.slider(
     label=""":orange[Set LLM Temperature]. The :blue[lower] the temperature, the :blue[less] random the model will be. The :blue[higher] the temperature, the :blue[more] random the model will be.""",
     min_value=0.0,
     max_value=1.0,
-    value=0.4,
+    value=0.35,
     step=0.05,
     key="llm_temperature",
 )
