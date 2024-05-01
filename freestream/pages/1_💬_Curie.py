@@ -57,7 +57,7 @@ memory = ConversationBufferMemory(
 )
 
 # Button to clear conversation history
-if st.sidebar.button("Clear message history"):
+if st.sidebar.button("Clear message history", use_container_width=True):
     msgs.clear()
 
 # Create a dictionary with keys to chat model classes
@@ -142,29 +142,17 @@ avatars = {"human": "user", "ai": "assistant"}
 for msg in msgs.messages:
     st.chat_message(avatars[msg.type]).write(msg.content)
 
-## Create an on/off switch for the GIF background
-st.sidebar.divider()
-# Define a GIF toggle
-gif_bg = st.sidebar.toggle(
-    label="Rain Background",
-    value=False,
-    key="gif_background",
-    help="Turn on an experimental background.",
-)
-if gif_bg:
-    set_bg_local("assets/62.gif")
-
 # Save the formatted conversation history to a variable
 formatted_history = save_conversation_history(msgs.messages)
 # Create a sidebar button to download the conversation history
 st.sidebar.download_button(
-    label="Download \n\nconversation history",
+    label="Download conversation history",
     data=formatted_history,
     file_name="conversation_history.txt",
     mime="text/plain",
     key="download_conversation_history_button",
     help="Download the conversation history as a text file with some formatting.",
-    use_container_width=False,   
+    use_container_width=True,   
 )
 
 # Display user input field and enter button
@@ -182,3 +170,15 @@ if user_query := st.chat_input(placeholder="What's on your mind?"):
                 "callbacks": [stream_handler],
             },
         )
+
+## Create an on/off switch for the GIF background
+st.sidebar.divider()
+# Define a GIF toggle
+gif_bg = st.sidebar.toggle(
+    label="Rain Background",
+    value=False,
+    key="gif_background",
+    help="Turn on an experimental background.",
+)
+if gif_bg:
+    set_bg_local("assets/62.gif")
