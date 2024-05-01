@@ -1,18 +1,17 @@
+import datetime
 import os
 
 import streamlit as st
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
-from langchain_community.chat_message_histories import StreamlitChatMessageHistory
 from langchain_anthropic import ChatAnthropic
+from langchain_community.chat_message_histories import \
+    StreamlitChatMessageHistory
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_openai import ChatOpenAI
-from pages import (
-    PrintRetrievalHandler,
-    StreamHandler,
-    RetrieveDocuments,
-    set_llm,
-    footer,
-)
+from pages import (PrintRetrievalHandler, RetrieveDocuments, StreamHandler,
+                   footer, save_conversation_history, set_bg_local, set_llm)
 
 # Initialize LangSmith tracing
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
@@ -21,27 +20,14 @@ os.environ["LANGCHAIN_ENDPOINT"] = st.secrets.LANGCHAIN.LANGCHAIN_ENDPOINT
 os.environ["LANGCHAIN_API_KEY"] = st.secrets.LANGCHAIN.LANGCHAIN_API_KEY
 
 # Set up page config
-st.set_page_config(page_title="FreeStream: RAGbot", page_icon="🤖")
-st.title("🤖RAGbot")
-st.header(":green[_Retrieval Augmented Generation Chatbot_]", divider="red")
-st.caption(":violet[_Ask Your Documents Questions_]")
+st.set_page_config(page_title="FreeStream: Curie", page_icon="💬")
+st.title("💬Chatbot")
+st.header(":green[_General Purpose Chatbot_]", divider="red")
 # Show footer
 st.markdown(footer, unsafe_allow_html=True)
 
 # Add sidebar
 st.sidebar.subheader("__User Panel__")
-# Add file-upload button
-uploaded_files = st.sidebar.file_uploader(
-    label="Upload a PDF or text file",
-    type=["pdf", "doc", "docx", "txt"],
-    help="Types supported: pdf, doc, docx, txt \n\nConsider the size of your files before you upload. Processing speed varies by server load.",
-    accept_multiple_files=True,
-)
-if not uploaded_files:
-    st.info("Please upload documents to continue.")
-    st.stop()
-
-retriever = RetrieveDocuments().configure_retriever(uploaded_files)
 
 # Add temperature header
 temperature_header = st.sidebar.markdown(
@@ -54,7 +40,7 @@ temperature_slider = st.sidebar.slider(
     label=""":orange[Set LLM Temperature]. The :blue[lower] the temperature, the :blue[less] random the model will be. The :blue[higher] the temperature, the :blue[more] random the model will be.""",
     min_value=0.0,
     max_value=1.0,
-    value=0.0,
+    value=0.35,
     step=0.05,
     key="llm_temperature",
 )
@@ -64,6 +50,10 @@ msgs = StreamlitChatMessageHistory()
 memory = ConversationBufferMemory(
     memory_key="chat_history", chat_memory=msgs, return_messages=True
 )
+
+# Button to clear conversation history
+if st.sidebar.button("Clear message history", use_container_width=True):
+    msgs.clear()
 
 # Create a dictionary with keys to chat model classes
 model_names = {
@@ -76,12 +66,12 @@ model_names = {
         max_retries=1,  # Set the maximum number of retries for the model
     ),
     "GPT-4 Turbo": ChatOpenAI(
-        model="gpt-4-0125-preview",
-        openai_api_key=st.secrets.OPENAI.openai_api_key,
-        temperature=temperature_slider,
-        streaming=True,
-        max_tokens=4096,
-        max_retries=1,
+       model="gpt-4-0125-preview",
+       openai_api_key=st.secrets.OPENAI.openai_api_key,
+       temperature=temperature_slider,
+       streaming=True,
+       max_tokens=4096,
+       max_retries=1,
     ),
     "Claude: Haiku": ChatAnthropic(
         model="claude-3-haiku-20240307",
@@ -121,19 +111,61 @@ llm = model_names[
     selected_model
 ]  # Get the selected model from the `model_names` dictionary
 
-# Create a chain that ties everything together
-qa_chain = ConversationalRetrievalChain.from_llm(
-    llm, retriever=retriever, memory=memory, verbose=True
+# Define the prompt template
+prompt_template = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            """You are a friendly AI chatbot designed to assist users in comprehending reality, exploring their curiosity, and practicing critical thinking skills. Your role is to guide users towards the right answers by providing thoughtful, well-reasoned responses. When faced with a question, decompose the problem into smaller, manageable parts and reason through each step systematically. This approach will help you provide comprehensive and accurate answers. Remember, your goal is to enhance learning and understanding, so only provide direct advice when explicitly asked to do so. Always strive to provide responses that are relevant, accurate, and contextually appropriate.""",
+        ),
+        MessagesPlaceholder(variable_name="chat_history"),
+        ("human", "{question}"),
+    ]
 )
 
-# Define a button to clear the conversation history
-if len(msgs.messages) == 0 or st.sidebar.button("Clear message history"):
-    msgs.clear()
+# Create a chain that ties everything together
+chain = prompt_template | llm
+chain_with_history = RunnableWithMessageHistory(
+    runnable=chain,
+    get_session_history=lambda session_id: msgs,
+    input_messages_key="question",
+    history_messages_key="chat_history",
+)
 
 # Display coversation history window
 avatars = {"human": "user", "ai": "assistant"}
 for msg in msgs.messages:
     st.chat_message(avatars[msg.type]).write(msg.content)
+
+# Display user input field and enter button
+if user_query := st.chat_input(placeholder="What's on your mind?"):
+    st.chat_message("user").write(user_query)
+
+    # Display assistant response
+    # Using a `with` block instantly displays the response without having to `st.write` it
+    with st.chat_message("assistant"):
+        stream_handler = StreamHandler(st.empty())
+        response = chain_with_history.invoke(
+            {"question": user_query},
+            config={
+                "configurable": {"session_id": "any"},
+                "callbacks": [stream_handler],
+            },
+        )
+
+# Save the formatted conversation history to a variable
+formatted_history = save_conversation_history(msgs.messages)
+current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+# Create a sidebar button to download the conversation history
+st.sidebar.download_button(
+    label="Download conversation history",
+    data=formatted_history,
+    file_name=f"conversation_history {current_time}.txt",
+    mime="text/plain",
+    key="download_conversation_history_button",
+    help="Download the conversation history as a text file with some formatting.",
+    use_container_width=True,   
+)
 
 ## Create an on/off switch for the GIF background
 st.sidebar.divider()
@@ -146,18 +178,3 @@ gif_bg = st.sidebar.toggle(
 )
 if gif_bg:
     set_bg_local("assets/62.gif")
-    
-# Display user input field and enter button
-if user_query := st.chat_input(placeholder="Ask me about your documents!"):
-    st.chat_message("user").write(user_query)
-
-    # Display assistant response
-    with st.chat_message("assistant"):
-        retrieval_handler = PrintRetrievalHandler(st.container())
-        stream_handler = StreamHandler(st.empty())
-        response = qa_chain.run(
-            user_query, callbacks=[retrieval_handler, stream_handler]
-        )
-        # Force print Gemini's response
-        if selected_model == "Gemini-Pro":
-            st.write(response)

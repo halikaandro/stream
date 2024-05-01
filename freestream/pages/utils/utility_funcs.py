@@ -4,12 +4,13 @@ import logging
 import os
 import sys
 import tempfile
-from typing import List
+from typing import Any, List
 
 import streamlit as st
 import torch
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.chat_message_histories import StreamlitChatMessageHistory
+from langchain_community.chat_message_histories import \
+    StreamlitChatMessageHistory
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
@@ -234,6 +235,25 @@ def set_bg_local(main_bg):
         unsafe_allow_html=True,
     )
 
+# Create a function to save the conversation history to a file
+def save_conversation_history(conversation_history: List[Any]) -> str:
+    """
+    Utility function to format and prepare the conversation history for download.
+
+    Parameters:
+    conversation_history (List[Any]): List of objects containing the conversation history.
+
+    Returns:
+    str: Formatted conversation history ready for download.
+    """
+    formatted_history = ""
+    for msg in conversation_history:
+        if msg.type == 'human':
+            formatted_history += f"Human: {msg.content}\n\n"
+        elif msg.type == 'ai':
+            formatted_history += f"Assistant: {msg.content}\n\n"
+
+    return formatted_history
 
 ################################
 ### CUSTOM CALLBACK HANDLERS ###
