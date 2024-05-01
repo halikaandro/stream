@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 import tempfile
-from typing import List
+from typing import List, Any
 
 import streamlit as st
 import torch
@@ -245,6 +245,10 @@ def save_conversation_history(conversation_history: List[Any]) -> str:
     Returns:
     str: Formatted conversation history ready for download.
     """
+    # Check the type of the messages attribute
+    if conversation_history:
+        print(f"Type of messages attribute: {type(conversation_history[0])}")
+        
     formatted_history = ""
     for msg in conversation_history:
         if msg['type'] == 'human':
