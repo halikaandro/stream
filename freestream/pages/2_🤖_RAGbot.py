@@ -132,17 +132,19 @@ avatars = {"human": "user", "ai": "assistant"}
 for msg in msgs.messages:
     st.chat_message(avatars[msg.type]).write(msg.content)
 
-# Display user input field and enter button
-if user_query := st.chat_input(placeholder="Ask me about your documents!"):
-    st.chat_message("user").write(user_query)
-
-    # Display assistant response
-    with st.chat_message("assistant"):
-        retrieval_handler = PrintRetrievalHandler(st.container())
-        stream_handler = StreamHandler(st.empty())
-        response = qa_chain.run(
-            user_query, callbacks=[retrieval_handler, stream_handler]
-        )
+# Save the formatted conversation history to a variable
+formatted_history = save_conversation_history(msgs.messages)
+current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+# Create a sidebar button to download the conversation history
+st.sidebar.download_button(
+    label="Download conversation history",
+    data=formatted_history,
+    file_name=f"conversation_history {current_time}.txt",
+    mime="text/plain",
+    key="download_conversation_history_button",
+    help="Download the conversation history as a text file with some formatting.",
+    use_container_width=True,   
+)
 
 # Save the formatted conversation history to a variable
 formatted_history = save_conversation_history(msgs.messages)
@@ -169,3 +171,16 @@ gif_bg = st.sidebar.toggle(
 )
 if gif_bg:
     set_bg_local("assets/62.gif")
+
+# Display user input field and enter button
+if user_query := st.chat_input(placeholder="Ask me about your documents!"):
+    st.chat_message("user").write(user_query)
+
+    # Display assistant response
+    with st.chat_message("assistant"):
+        retrieval_handler = PrintRetrievalHandler(st.container())
+        stream_handler = StreamHandler(st.empty())
+        response = qa_chain.run(
+            user_query, callbacks=[retrieval_handler, stream_handler]
+        )
+
