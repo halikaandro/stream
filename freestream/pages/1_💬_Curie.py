@@ -137,22 +137,6 @@ avatars = {"human": "user", "ai": "assistant"}
 for msg in msgs.messages:
     st.chat_message(avatars[msg.type]).write(msg.content)
 
-# Display user input field and enter button
-if user_query := st.chat_input(placeholder="What's on your mind?"):
-    st.chat_message("user").write(user_query)
-
-    # Display assistant response
-    # Using a `with` block instantly displays the response without having to `st.write` it
-    with st.chat_message("assistant"):
-        stream_handler = StreamHandler(st.empty())
-        response = chain_with_history.invoke(
-            {"question": user_query},
-            config={
-                "configurable": {"session_id": "any"},
-                "callbacks": [stream_handler],
-            },
-        )
-
 # Save the formatted conversation history to a variable
 formatted_history = save_conversation_history(msgs.messages)
 current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -178,3 +162,19 @@ gif_bg = st.sidebar.toggle(
 )
 if gif_bg:
     set_bg_local("assets/62.gif")
+
+# Display user input field and enter button
+if user_query := st.chat_input(placeholder="What's on your mind?"):
+    st.chat_message("user").write(user_query)
+
+    # Display assistant response
+    # Using a `with` block instantly displays the response without having to `st.write` it
+    with st.chat_message("assistant"):
+        stream_handler = StreamHandler(st.empty())
+        response = chain_with_history.invoke(
+            {"question": user_query},
+            config={
+                "configurable": {"session_id": "any"},
+                "callbacks": [stream_handler],
+            },
+        )
