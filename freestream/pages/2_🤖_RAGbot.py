@@ -146,20 +146,6 @@ st.sidebar.download_button(
     use_container_width=True,   
 )
 
-# Save the formatted conversation history to a variable
-formatted_history = save_conversation_history(msgs.messages)
-current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-# Create a sidebar button to download the conversation history
-st.sidebar.download_button(
-    label="Download conversation history",
-    data=formatted_history,
-    file_name=f"conversation_history {current_time}.txt",
-    mime="text/plain",
-    key="download_conversation_history_button",
-    help="Download the conversation history as a text file with some formatting.",
-    use_container_width=True,   
-)
-
 ## Create an on/off switch for the GIF background
 st.sidebar.divider()
 # Define a GIF toggle
